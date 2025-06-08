@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from './ThemeToggle'
 import { useAuth } from '@/features/authentication'
 
 export function Header() {
@@ -35,8 +36,9 @@ export function Header() {
             )}
           </nav>
 
-          {/* Auth Buttons */}
+          {/* Theme Toggle & Auth Buttons */}
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-muted-foreground">
