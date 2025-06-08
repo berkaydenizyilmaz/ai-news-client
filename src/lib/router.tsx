@@ -18,14 +18,6 @@ export const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: 'login',
-        element: <LoginForm />,
-      },
-      {
-        path: 'register',
-        element: <RegisterForm />,
-      },
-      {
         path: 'admin',
         element: <div>Admin Panel</div>,
       },
@@ -34,5 +26,13 @@ export const router = createBrowserRouter([
         element: <NotFoundPage />,
       },
     ],
+  },
+  {
+    path: 'login',
+    element: <LoginForm />,
+  },
+  {
+    path: 'register',
+    element: <RegisterForm />,
   },
 ]) 
