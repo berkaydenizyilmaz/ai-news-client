@@ -1,13 +1,11 @@
+import { RouterProvider } from 'react-router-dom'
 import { QueryProvider } from './QueryProvider'
+import { router } from '@/lib/router'
 
-interface AppProvidersProps {
-  children: React.ReactNode
-}
-
-export function AppProviders({ children }: AppProvidersProps) {
+export function AppProviders() {
   return (
     <QueryProvider>
-      {children}
+      <RouterProvider router={router} />
     </QueryProvider>
   )
 } 
