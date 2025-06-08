@@ -2,9 +2,9 @@ import { createBrowserRouter } from 'react-router-dom'
 import { RootLayout } from '@/components/common/RootLayout'
 import { HomePage } from '@/components/common/HomePage'
 import { NotFoundPage } from '@/components/common/NotFoundPage'
-import { ProtectedRoute } from '@/components/common/ProtectedRoute'
 import { LoginForm, RegisterForm } from '@/features/authentication'
 import { AdminHome, LogViewer } from '@/features/admin'
+import { requireAdmin, redirectIfAuthenticated } from './authLoader'
 
 /**
  * React Router kullanarak uygulama yönlendirici yapılandırması
@@ -21,19 +21,13 @@ export const router = createBrowserRouter([
       },
       {
         path: 'admin',
-        element: (
-          <ProtectedRoute requiredRole="admin">
-            <AdminHome />
-          </ProtectedRoute>
-        ),
+        loader: requireAdmin,
+        element: <AdminHome />,
       },
       {
         path: 'admin/logs',
-        element: (
-          <ProtectedRoute requiredRole="admin">
-            <LogViewer />
-          </ProtectedRoute>
-        ),
+        loader: requireAdmin,
+        element: <LogViewer />,
       },
       {
         path: '*',
@@ -43,10 +37,12 @@ export const router = createBrowserRouter([
   },
   {
     path: 'login',
+    loader: redirectIfAuthenticated,
     element: <LoginForm />,
   },
   {
     path: 'register',
+    loader: redirectIfAuthenticated,
     element: <RegisterForm />,
   },
 ]) 

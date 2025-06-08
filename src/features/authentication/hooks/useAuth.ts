@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/authStore'
 import { useLogin, useRegister } from '../services/authApi'
@@ -10,7 +9,6 @@ import type { LoginRequest, RegisterRequest } from '../types'
  * @returns Kimlik doğrulama durumu ve metodları
  */
 export const useAuth = () => {
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { user, isAuthenticated, setAuth, clearAuth, setLoading } = useAuthStore()
   
@@ -66,17 +64,14 @@ export const useAuth = () => {
   }
 
   /**
-   * Mevcut kullanıcıyı çıkış yapar ve ana sayfaya yönlendirir
+   * Mevcut kullanıcıyı çıkış yapar
+   * Modern loader pattern sayesinde otomatik yönlendirme yapılır
    */
   const logout = () => {
     clearAuth()
     // TanStack Query cache'ini temizle
     queryClient.clear()
-    // Admin sayfasındaysa ana sayfaya yönlendir
-    const currentPath = window.location.pathname
-    if (currentPath.startsWith('/admin')) {
-      navigate('/', { replace: true })
-    }
+    // Loader'lar otomatik olarak yönlendirme yapacak
   }
 
   return {
