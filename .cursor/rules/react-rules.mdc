@@ -1,0 +1,79 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# React Projeleri İçin Önerilen Yapı ve Kullanım Kuralları
+
+## 1. Temel Felsefe ve Amaç
+
+Bu kurallar, React ve Next.js projelerinde modülerliği, ölçeklenebilirliği, bakımı kolaylığı ve geliştirici verimliliğini artırmayı hedefler. "Aşırı dosya oluşturmama" prensibi gözetilerek, mantıksal bütünlük ve okunabilirlik ön planda tutulur.
+
+## 2. Ana Dosya Yapısı (Özellik Tabanlı Mimari)
+
+Projeler, **özellik tabanlı (feature-based)** bir mimari üzerine kurulmalıdır.
+
+* **`src/features/`**: Uygulamanın ana işlevsel modülleri (özellikleri) burada tanımlanır.
+    * Her bir özellik klasörü (örn: `src/features/authentication/`, `src/features/products/`) kendi içinde şunları barındırmalıdır:
+        * `components/`: Sadece o özelliğe ait UI bileşenleri.
+        * `hooks/`: Sadece o özelliğe ait custom React hook'ları.
+        * `services/` veya `api/`: O özellikle ilgili API çağrı fonksiyonları ve TanStack Query hook'ları (örn: `queries.ts`, `mutations.ts`).
+        * `store/` (opsiyonel): O özelliğe özel Zustand store'u veya Context yapıları.
+        * `types/` veya `*.types.ts`: O özelliğe özel TypeScript tip tanımları.
+        * `validations/` (opsiyonel): O özelliğe özel Zod/Yup gibi validasyon şemaları.
+        * `utils/` (opsiyonel): Sadece o özelliğe ait yardımcı fonksiyonlar.
+        * `index.ts`: Özellikten dışa aktarılacak ana bileşenler, hook'lar veya fonksiyonlar için bir giriş noktası.
+* **`src/components/`**:
+    * `ui/`: Shadcn/ui gibi kütüphanelerden CLI ile eklenen, projenin temel UI elemanları (Button, Input, Card vb.). Bu bileşenler doğrudan burada özelleştirilebilir.
+    * `common/` veya `shared/`: Projeye özgü, birden fazla özellik tarafından kullanılabilen genel amaçlı bileşenler (örn: `PageLayout`, `IconRenderer`).
+* **`src/lib/`**: Genel yardımcı fonksiyonlar, API istemcisi konfigürasyonları (örn: `axiosInstance.ts`, `queryClient.ts`), genel sabitler (`constants.ts`) ve global tip tanımları (`global.d.ts`).
+* **`src/hooks/`**: Birden fazla özellik tarafından kullanılabilen global custom React hook'ları.
+* **`src/store/`**: Uygulama genelini etkileyen global Zustand store'ları (örn: `authStore.ts`, `settingsStore.ts`).
+* **`src/app/` (Next.js App Router için)**: Sayfalar, route'lar ve layout'lar dosya sistemi tabanlı olarak burada yönetilir. Özellik bazlı gruplama için `(featureGroupName)/featureName/page.tsx` yapısı kullanılabilir.
+    * `layout.tsx`: Kök veya grup layout'ları. `QueryClientProvider`, `ThemeProvider` gibi genel sarmalayıcılar burada yer alabilir.
+    * `globals.css`: Tailwind CSS direktifleri ve global CSS değişkenleri.
+* **`src/providers/`**: Uygulama genelindeki ana Context Provider'larını (ThemeProvider, AuthProvider vb.) birleştiren bileşenler.
+* **`src/config/`**: Uygulama yapılandırmaları (API endpoint'leri, ortam değişkenleri vb.).
+* **`src/styles/`**: Ek global CSS dosyaları (Tailwind dışında).
+* **`public/`**: Statik varlıklar.
+* **Kök Dizin**: `tailwind.config.js` (veya `.ts`), `tsconfig.json` (path alias'ları `@/*` burada tanımlanmalı), `next.config.mjs` (veya `vite.config.ts`), `.eslintrc.json`, `package.json`.
+
+## 3. Bileşen Geliştirme Kuralları
+
+* **Shadcn/ui Kullanımı**: Temel UI elemanları için Shadcn/ui tercih edilir. Bileşenler `npx shadcn-ui@latest add <component>` komutu ile `src/components/ui` altına eklenir ve doğrudan proje içinde özelleştirilir.
+* **Özelleştirme**: `tailwind.config.js` ve global CSS değişkenleri (`globals.css` içinde) aracılığıyla Shadcn/ui bileşenleri projenin tasarım sistemine uygun hale getirilir.
+* **Bileşen Sorumluluğu**: Bileşenler mümkün olduğunca tek bir sorumluluğa odaklanmalı ve yeniden kullanılabilir olmalıdır. Karmaşık bileşenler daha küçük alt bileşenlere bölünmelidir.
+* **İsimlendirme**: Bileşen isimleri PascalCase (örn: `ProductCard.tsx`) olmalıdır.
+
+## 4. State Yönetimi Kuralları
+
+* **Katmanlı Yaklaşım**:
+    1.  **Sunucu State'i**: Her zaman **TanStack Query (React Query)** kullanılmalıdır. API'den gelen veriler, önbellekleme, yeniden getirme ve mutasyonlar bu kütüphane ile yönetilir.
+    2.  **Global Client-Side State**: Uygulama genelini etkileyen (örn: kullanıcı oturumu, tema, genel bildirimler) client-side state için **Zustand** tercih edilir. Store'lar `src/store/` altında modüler olarak (örn: `authStore.ts`) tanımlanır.
+    3.  **Özelliğe Özel Client-Side State**: Bir özelliğin kendi içinde karmaşık ve birden fazla bileşeni etkileyen bir state'i varsa, özellik bazlı Zustand store (`src/features/featureName/store/featureStore.ts`) veya React Context API (`src/features/featureName/contexts/`) kullanılabilir.
+    4.  **Yerel State**: Tek bir bileşene özgü state için React'in yerleşik hook'ları (`useState`, `useReducer`) kullanılır.
+* **Zustand Kullanımı**: Store'lar basit ve odaklı tutulmalıdır. Seçiciler (selectors) ile bileşenlerin yalnızca ihtiyaç duydukları state parçalarına abone olması sağlanarak performans optimize edilir.
+* **Gereksiz State'ten Kaçınma**: Özellikle sunucudan gelen ve TanStack Query ile yönetilebilecek veriler için client-side global state (Zustand vb.) oluşturulmamalıdır.
+
+## 5. Veri Akışı ve API Etkileşimleri (Servis Katmanı)
+
+* **TanStack Query Odaklı**: API istekleri ve veri işleme mantığı, ilgili özelliğin `services/` (veya `api/`) klasöründe toplanmalıdır. Bu katman, TanStack Query hook'larını (`useQuery`, `useMutation`) kullanarak veri çekme ve güncelleme işlemlerini soyutlar.
+    * Örn: `src/features/products/services/queries.ts` içinde `useGetProducts`, `useGetProductById`.
+    * Örn: `src/features/products/services/mutations.ts` içinde `useCreateProduct`.
+* **API İstemcisi**: Merkezi bir API istemcisi (Axios veya fetch sarmalayıcısı) `src/lib/apiClient.ts` gibi bir dosyada yapılandırılabilir ve servis katmanında kullanılabilir.
+
+## 6. Modülerlik ve Optimizasyon Kuralları
+
+* **Custom Hook'lar**: Tekrarlayan mantık veya karmaşık state işlemleri için custom hook'lar (`useIsMobile`, `useFormValidation` vb.) oluşturulmalı ve ilgili özelliğin `hooks/` klasöründe veya global ise `src/hooks/` klasöründe tutulmalıdır.
+* **Code Splitting ve Lazy Loading**: `React.lazy` ve `Suspense` (veya Next.js'in dinamik importları) ile rota bazlı veya büyük bileşenler için kod bölme teknikleri uygulanarak ilk yükleme performansı artırılmalıdır.
+* **Memoization**: `React.memo`, `useMemo`, `useCallback` hook'ları gereksiz yeniden render'ları önlemek için bilinçli bir şekilde (performans profili çıkarıldıktan sonra ve gerçekten ihtiyaç duyulan yerlerde) kullanılmalıdır. Aşırı ve gereksiz memoization'dan kaçınılmalıdır.
+
+## 7. Genel Geliştirme Kuralları
+
+* **TypeScript**: Tüm projede tip güvenliği ve geliştirici deneyimini artırmak için TypeScript kullanılmalıdır. Tipler açık ve net bir şekilde tanımlanmalıdır.
+* **Form Yönetimi**: Karmaşık formlar için **React Hook Form** ve validasyon için **Zod** (veya Yup) tercih edilmelidir. Validasyon şemaları `src/lib/validations` veya özellik bazlı (`src/features/featureName/validations`) olarak organize edilebilir.
+* **İsimlendirme Standartları**: Dosya ve klasör isimleri kebab-case (örn: `product-card.tsx`, `auth-store.ts`) veya PascalCase (bileşenler için `ProductCard.tsx`), değişken ve fonksiyon isimleri camelCase olmalıdır.
+* **"Aşırı Dosya Oluşturmama"**: Mantıksal olarak bir arada olması gereken küçük kod parçalarını (tipler, basit yardımcı fonksiyonlar, çok küçük alt bileşenler) gereksiz yere ayrı dosyalara bölmekten kaçınılmalıdır. Bir özelliğin veya bileşenin tüm tipleri genellikle tek bir `types.ts` dosyasında toplanabilir. Amaç, okunabilirliği ve yönetilebilirliği artırırken dosya sayısını makul seviyede tutmaktır.
+* **Path Alias'ları**: `tsconfig.json` içinde `@/components`, `@/features`, `@/lib` gibi path alias'ları tanımlanarak göreceli import karmaşası önlenmeli ve okunabilirlik artırılmalıdır.
+
+* **Linting ve Formatlama**: ESLint ve Prettier gibi araçlar tutarlı bir kod stili için yapılandırılmalı ve kullanılmalıdır.
