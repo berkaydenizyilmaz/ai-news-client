@@ -3,7 +3,7 @@ import { apiClient } from './apiClient'
 /**
  * Log seviyeleri
  */
-export type LogLevel = 'info' | 'warn' | 'error' | 'debug'
+export type LogLevel = 'info' | 'warn' | 'warning' | 'error' | 'debug'
 
 /**
  * Uygulama modülleri

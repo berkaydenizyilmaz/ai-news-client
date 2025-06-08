@@ -1,5 +1,5 @@
 // Components
-export { AdminDashboard } from './components/AdminDashboard'
+export { AdminHome } from './components/AdminHome'
 export { LogViewer } from './components/LogViewer'
 
 // API Services

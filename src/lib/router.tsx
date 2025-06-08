@@ -3,6 +3,7 @@ import { RootLayout } from '@/components/common/RootLayout'
 import { HomePage } from '@/components/common/HomePage'
 import { NotFoundPage } from '@/components/common/NotFoundPage'
 import { LoginForm, RegisterForm } from '@/features/authentication'
+import { AdminHome, LogViewer } from '@/features/admin'
 
 /**
  * React Router kullanarak uygulama yönlendirici yapılandırması
@@ -19,7 +20,11 @@ export const router = createBrowserRouter([
       },
       {
         path: 'admin',
-        element: <div>Admin Panel</div>,
+        element: <AdminHome />,
+      },
+      {
+        path: 'admin/logs',
+        element: <LogViewer />,
       },
       {
         path: '*',

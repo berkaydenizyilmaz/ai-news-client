@@ -1,20 +1,20 @@
 import { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { useLogs, useDeleteLog } from '../services/logApi'
 import type { LogQuery, LogLevel, LogModule } from '../types'
-import { Trash2, Search, Filter, Calendar, User, AlertTriangle, Info, Bug } from 'lucide-react'
+import { Trash2, Search, AlertTriangle, Info, Bug, ChevronLeft, ChevronRight } from 'lucide-react'
 
 /**
  * Log seviyesi için renk ve ikon eşleştirmesi
  */
 const logLevelConfig = {
   info: { color: 'bg-blue-500', icon: Info, label: 'Bilgi' },
-  warn: { color: 'bg-yellow-500', icon: AlertTriangle, label: 'Uyarı' },
+  warning: { color: 'bg-yellow-500', icon: AlertTriangle, label: 'Uyarı' },
+  warn: { color: 'bg-yellow-500', icon: AlertTriangle, label: 'Uyarı' }, // Backward compatibility
   error: { color: 'bg-red-500', icon: AlertTriangle, label: 'Hata' },
   debug: { color: 'bg-gray-500', icon: Bug, label: 'Debug' },
 } as const
@@ -23,25 +23,23 @@ const logLevelConfig = {
  * Modül etiketleri
  */
 const moduleLabels: Record<LogModule, string> = {
-  auth: 'Kimlik Doğrulama',
+  auth: 'Auth',
   rss: 'RSS',
-  news: 'Haberler',
-  settings: 'Ayarlar',
+  news: 'News',
+  settings: 'Settings',
   forum: 'Forum',
-  users: 'Kullanıcılar',
-  reports: 'Raporlar',
-  notification: 'Bildirimler',
+  users: 'Users',
+  reports: 'Reports',
+  notification: 'Notifications',
 }
 
 /**
- * Log görüntüleme ve yönetim bileşeni
- * Log listesi, filtreleme ve silme işlemlerini sağlar
- * @returns Log viewer için JSX elementi
+ * Kompakt log görüntüleme ve yönetim bileşeni
  */
 export function LogViewer() {
   const [filters, setFilters] = useState<LogQuery>({
     page: 1,
-    limit: 20,
+    limit: 50,
   })
 
   const { data: logsData, isLoading, error } = useLogs(filters)
@@ -50,22 +48,20 @@ export function LogViewer() {
   const logs = logsData?.data?.logs || []
   const pagination = logsData?.data?.pagination
 
+
   /**
-   * Filtreleri günceller
-   * @param key - Filtre anahtarı
-   * @param value - Filtre değeri
+   * Filtreleri günceller - hata düzeltildi
    */
-     const updateFilter = (key: keyof LogQuery, value: string | number | undefined) => {
-     setFilters(prev => ({
-       ...prev,
-       [key]: value || undefined,
-       page: key !== 'page' ? 1 : (typeof value === 'number' ? value : 1), // Sayfa dışındaki filtreler değiştiğinde ilk sayfaya dön
-     }))
-   }
+  const updateFilter = (key: keyof LogQuery, value: string | number | undefined) => {
+    setFilters(prev => ({
+      ...prev,
+      [key]: value === '' || value === 'all' ? undefined : value,
+      page: key !== 'page' ? 1 : (typeof value === 'number' ? value : 1),
+    }))
+  }
 
   /**
    * Log silme işlemi
-   * @param logId - Silinecek log ID'si
    */
   const handleDeleteLog = async (logId: string) => {
     if (confirm('Bu log kaydını silmek istediğinizden emin misiniz?')) {
@@ -74,149 +70,124 @@ export function LogViewer() {
   }
 
   /**
-   * Tarihi formatlar
-   * @param dateString - ISO tarih string'i
-   * @returns Formatlanmış tarih
+   * Kompakt tarih formatı
    */
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('tr-TR')
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMins / 60)
+    const diffDays = Math.floor(diffHours / 24)
+
+    if (diffMins < 1) return 'Şimdi'
+    if (diffMins < 60) return `${diffMins}dk önce`
+    if (diffHours < 24) return `${diffHours}sa önce`
+    if (diffDays < 7) return `${diffDays}g önce`
+    return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' })
   }
 
   if (error) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-destructive">
-            <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
-            <p>Loglar yüklenirken hata oluştu</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center text-destructive">
+          <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
+          <p>Loglar yüklenirken hata oluştu</p>
+        </div>
+      </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Başlık */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">Log Yönetimi</h1>
-        <p className="text-muted-foreground">
-          Sistem loglarını görüntüle, filtrele ve yönet
-        </p>
+    <div className="space-y-4">
+      {/* Kompakt Başlık */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Sistem Logları</h1>
+          <p className="text-sm text-muted-foreground">
+            {pagination?.total_items || 0} kayıt
+          </p>
+        </div>
       </div>
 
-      {/* Filtreler */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filtreler
-          </CardTitle>
-          <CardDescription>
-            Logları filtrelemek için aşağıdaki seçenekleri kullanın
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="level">Seviye</Label>
-              <Select
-                value={filters.level || ''}
-                onValueChange={(value) => updateFilter('level', value as LogLevel)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Tüm seviyeler" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Tüm seviyeler</SelectItem>
-                  <SelectItem value="info">Bilgi</SelectItem>
-                  <SelectItem value="warn">Uyarı</SelectItem>
-                  <SelectItem value="error">Hata</SelectItem>
-                  <SelectItem value="debug">Debug</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="module">Modül</Label>
-              <Select
-                value={filters.module || ''}
-                onValueChange={(value) => updateFilter('module', value as LogModule)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Tüm modüller" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Tüm modüller</SelectItem>
-                  {Object.entries(moduleLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="start_date">Başlangıç Tarihi</Label>
-              <Input
-                id="start_date"
-                type="date"
-                value={filters.start_date || ''}
-                onChange={(e) => updateFilter('start_date', e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="end_date">Bitiş Tarihi</Label>
-              <Input
-                id="end_date"
-                type="date"
-                value={filters.end_date || ''}
-                onChange={(e) => updateFilter('end_date', e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setFilters({ page: 1, limit: 20 })}
+      {/* Kompakt Filtreler */}
+      <Card className="p-4">
+        <div className="flex flex-wrap gap-3 items-end">
+          <div className="min-w-[120px]">
+            <Select
+              value={filters.level || undefined}
+              onValueChange={(value) => updateFilter('level', value as LogLevel)}
             >
-              Filtreleri Temizle
-            </Button>
+              <SelectTrigger className="h-9">
+                <SelectValue placeholder="Seviye" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tümü</SelectItem>
+                <SelectItem value="info">Bilgi</SelectItem>
+                <SelectItem value="warning">Uyarı</SelectItem>
+                <SelectItem value="error">Hata</SelectItem>
+                <SelectItem value="debug">Debug</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </CardContent>
+
+          <div className="min-w-[120px]">
+            <Select
+              value={filters.module || undefined}
+              onValueChange={(value) => updateFilter('module', value as LogModule)}
+            >
+              <SelectTrigger className="h-9">
+                <SelectValue placeholder="Modül" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tümü</SelectItem>
+                {Object.entries(moduleLabels).map(([key, label]) => (
+                  <SelectItem key={key} value={key}>
+                    {label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Input
+            type="date"
+            className="h-9 w-auto"
+            value={filters.start_date || ''}
+            onChange={(e) => updateFilter('start_date', e.target.value)}
+          />
+
+          <Input
+            type="date"
+            className="h-9 w-auto"
+            value={filters.end_date || ''}
+            onChange={(e) => updateFilter('end_date', e.target.value)}
+          />
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFilters({ page: 1, limit: 50 })}
+          >
+            Temizle
+          </Button>
+        </div>
       </Card>
 
-      {/* Log Listesi */}
+      {/* Kompakt Log Listesi */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <Search className="h-5 w-5" />
-              Loglar
-            </span>
-            {pagination && (
-              <span className="text-sm text-muted-foreground">
-                {pagination.total_items} kayıt bulundu
-              </span>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {isLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-2 text-muted-foreground">Loglar yükleniyor...</p>
+            <div className="flex items-center justify-center h-32">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
             </div>
           ) : logs.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <Search className="h-8 w-8 mx-auto mb-2" />
-              <p>Hiç log kaydı bulunamadı</p>
+              <Search className="h-6 w-6 mx-auto mb-2" />
+              <p className="text-sm">Log bulunamadı</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="divide-y">
               {logs.map((log) => {
                 const levelConfig = logLevelConfig[log.level]
                 const LevelIcon = levelConfig.icon
@@ -224,49 +195,53 @@ export function LogViewer() {
                 return (
                   <div
                     key={log.id}
-                    className="border rounded-lg p-4 hover:bg-muted/50 transition-colors"
+                    className="p-3 hover:bg-muted/30 transition-colors"
                   >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <Badge variant="secondary" className={`${levelConfig.color} text-white`}>
-                            <LevelIcon className="h-3 w-3 mr-1" />
-                            {levelConfig.label}
-                          </Badge>
-                          <Badge variant="outline">
+                    <div className="flex items-start gap-3">
+                      {/* Seviye Badge */}
+                      <Badge 
+                        variant="secondary" 
+                        className={`${levelConfig.color} text-white shrink-0 h-5 px-1.5 text-xs`}
+                      >
+                        <LevelIcon className="h-3 w-3" />
+                      </Badge>
+
+                      {/* Ana İçerik */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant="outline" className="text-xs px-1.5 py-0">
                             {moduleLabels[log.module]}
                           </Badge>
-                          <span className="text-sm text-muted-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
+                          <span className="text-xs text-muted-foreground">
                             {formatDate(log.created_at)}
                           </span>
                           {log.user_id && (
-                            <span className="text-sm text-muted-foreground flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              {log.user_id}
+                            <span className="text-xs text-muted-foreground">
+                              User: {log.user_id}
                             </span>
                           )}
                         </div>
-                        <p className="text-sm">{log.message}</p>
-                        {log.metadata && Object.keys(log.metadata).length > 0 && (
-                          <details className="text-xs">
-                            <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
-                              Metadata ({Object.keys(log.metadata).length} alan)
-                            </summary>
-                            <pre className="mt-2 p-2 bg-muted rounded text-xs overflow-auto">
-                              {JSON.stringify(log.metadata, null, 2)}
-                            </pre>
-                          </details>
-                        )}
+                        
+                        <p className="text-sm font-medium text-foreground mb-1 line-clamp-2">
+                          {log.message}
+                        </p>
+                        
+                         {log.metadata && Object.keys(log.metadata).length > 0 && (
+                           <p className="text-xs text-muted-foreground line-clamp-1">
+                             {JSON.stringify(log.metadata)}
+                           </p>
+                         )}
                       </div>
+
+                      {/* Silme Butonu */}
                       <Button
                         variant="ghost"
                         size="sm"
+                        className="h-6 w-6 p-0 shrink-0"
                         onClick={() => handleDeleteLog(log.id)}
                         disabled={deleteLogMutation.isPending}
-                        className="text-destructive hover:text-destructive"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
@@ -274,35 +249,35 @@ export function LogViewer() {
               })}
             </div>
           )}
-
-          {/* Sayfalama */}
-          {pagination && pagination.total_pages > 1 && (
-            <div className="flex items-center justify-between mt-6">
-              <div className="text-sm text-muted-foreground">
-                Sayfa {pagination.current_page} / {pagination.total_pages}
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!pagination.has_prev}
-                  onClick={() => updateFilter('page', pagination.current_page - 1)}
-                >
-                  Önceki
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={!pagination.has_next}
-                  onClick={() => updateFilter('page', pagination.current_page + 1)}
-                >
-                  Sonraki
-                </Button>
-              </div>
-            </div>
-          )}
         </CardContent>
       </Card>
+
+      {/* Kompakt Pagination */}
+      {pagination && pagination.total_pages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Sayfa {pagination.current_page} / {pagination.total_pages}
+          </p>
+          <div className="flex gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => updateFilter('page', pagination.current_page - 1)}
+              disabled={pagination.current_page <= 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => updateFilter('page', pagination.current_page + 1)}
+              disabled={pagination.current_page >= pagination.total_pages}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 } 
