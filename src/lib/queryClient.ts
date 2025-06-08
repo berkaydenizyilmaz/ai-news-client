@@ -1,23 +1,44 @@
 import { QueryClient } from '@tanstack/react-query'
+import type { ApiError } from './types'
+
+const isApiError = (error: unknown): error is ApiError => {
+  return typeof error === 'object' && error !== null && 'message' in error
+}
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 dakika
       gcTime: 10 * 60 * 1000, // 10 dakika (eski cacheTime)
-      retry: (failureCount, error: any) => {
+      retry: (failureCount, error) => {
         // 401, 403, 404 hatalarında retry yapma
-        if (error?.response?.status === 401 || 
-            error?.response?.status === 403 || 
-            error?.response?.status === 404) {
-          return false
+        if (isApiError(error)) {
+          const status = error.response?.status
+          if (status === 401 || status === 403 || status === 404) {
+            return false
+          }
         }
         return failureCount < 3
       },
       refetchOnWindowFocus: false,
+      // Error boundary ile entegrasyon
+      throwOnError: (error) => {
+        // 500+ server hatalarını Error Boundary'ye fırlat
+        if (isApiError(error)) {
+          return (error.response?.status ?? 0) >= 500
+        }
+        return false
+      },
     },
     mutations: {
       retry: false,
+      // Mutation hatalarını da Error Boundary'ye fırlat
+      throwOnError: (error) => {
+        if (isApiError(error)) {
+          return (error.response?.status ?? 0) >= 500
+        }
+        return false
+      },
     },
   },
 }) 
