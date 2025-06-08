@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import apiClient from '@/lib/apiClient'
+import { logService } from '@/lib/logService'
 import type { ApiResponse } from '@/lib/types'
 import type { LoginRequest, RegisterRequest, AuthResponse, User } from '../types'
 
@@ -13,8 +14,27 @@ const authApi = {
    * @returns Kimlik doğrulama yanıtı ile Promise
    */
   login: async (data: LoginRequest): Promise<ApiResponse<AuthResponse>> => {
-    const response = await apiClient.post('/auth/login', data)
-    return response.data
+    try {
+      const response = await apiClient.post('/auth/login', data)
+      
+      // Başarılı giriş logu
+      if (response.data.success) {
+        await logService.info('auth', 'Kullanıcı başarıyla giriş yaptı', {
+          email: data.email,
+          user_id: response.data.data?.user.id,
+          login_method: 'email'
+        })
+      }
+      
+      return response.data
+    } catch (error) {
+      // Başarısız giriş logu
+      await logService.error('auth', 'Kullanıcı girişi başarısız', {
+        email: data.email,
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+      })
+      throw error
+    }
   },
 
   /**
@@ -23,8 +43,29 @@ const authApi = {
    * @returns Kimlik doğrulama yanıtı ile Promise
    */
   register: async (data: RegisterRequest): Promise<ApiResponse<AuthResponse>> => {
-    const response = await apiClient.post('/auth/register', data)
-    return response.data
+    try {
+      const response = await apiClient.post('/auth/register', data)
+      
+      // Başarılı kayıt logu
+      if (response.data.success) {
+        await logService.info('auth', 'Yeni kullanıcı kaydı oluşturuldu', {
+          email: data.email,
+          username: data.username,
+          user_id: response.data.data?.user.id,
+          registration_method: 'email'
+        })
+      }
+      
+      return response.data
+    } catch (error) {
+      // Başarısız kayıt logu
+      await logService.error('auth', 'Kullanıcı kaydı başarısız', {
+        email: data.email,
+        username: data.username,
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+      })
+      throw error
+    }
   },
 
   /**

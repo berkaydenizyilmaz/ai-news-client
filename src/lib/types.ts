@@ -4,7 +4,7 @@
  * Genel API yanıt yapısı
  * @template T - Veri yükünün tipi
  */
-export interface ApiResponse<T = unknown> {
+export interface ApiResponse<T> {
   /** İsteğin başarılı olup olmadığını belirtir */
   success: boolean;
   /** Yanıt veri yükü */

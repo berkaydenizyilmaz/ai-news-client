@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { logService } from '@/lib/logService'
 import type { User } from '@/features/authentication/types'
 
 /**
@@ -60,6 +61,17 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       clearAuth: () => {
+        const currentUser = get().user
+        
+        // Çıkış logu
+        if (currentUser) {
+          logService.info('auth', 'Kullanıcı çıkış yaptı', {
+            user_id: currentUser.id,
+            email: currentUser.email,
+            logout_method: 'manual'
+          })
+        }
+        
         localStorage.removeItem('auth_token')
         set({
           user: null,
