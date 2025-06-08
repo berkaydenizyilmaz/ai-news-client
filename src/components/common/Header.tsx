@@ -1,13 +1,9 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { useAuthStore } from '@/store/authStore'
+import { useAuth } from '@/features/authentication'
 
 export function Header() {
-  const { isAuthenticated, user, clearAuth } = useAuthStore()
-
-  const handleLogout = () => {
-    clearAuth()
-  }
+  const { isAuthenticated, user, logout } = useAuth()
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 w-full">
@@ -46,7 +42,7 @@ export function Header() {
                 <span className="text-sm text-muted-foreground">
                   Hoş geldin, {user?.username}
                 </span>
-                <Button variant="outline" size="sm" onClick={handleLogout}>
+                <Button variant="outline" size="sm" onClick={logout}>
                   Çıkış
                 </Button>
               </div>

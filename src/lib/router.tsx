@@ -1,6 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { RootLayout } from '@/components/common/RootLayout'
 import { HomePage } from '@/components/common/HomePage'
+import { NotFoundPage } from '@/components/common/NotFoundPage'
+import { LoginForm, RegisterForm } from '@/features/authentication'
 
 export const router = createBrowserRouter([
   {
@@ -13,15 +15,19 @@ export const router = createBrowserRouter([
       },
       {
         path: 'login',
-        element: <div>Login Sayfası</div>,
+        element: <LoginForm />,
       },
       {
         path: 'register',
-        element: <div>Register Sayfası</div>,
+        element: <RegisterForm />,
       },
       {
         path: 'admin',
         element: <div>Admin Panel</div>,
+      },
+      {
+        path: '*',
+        element: <NotFoundPage />,
       },
     ],
   },

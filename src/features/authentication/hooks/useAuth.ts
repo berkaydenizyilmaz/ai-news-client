@@ -1,0 +1,68 @@
+import { useAuthStore } from '@/store/authStore'
+import { useLogin, useRegister } from '../services/authApi'
+import type { LoginRequest, RegisterRequest } from '../types'
+
+export const useAuth = () => {
+  const { user, isAuthenticated, setAuth, clearAuth, setLoading } = useAuthStore()
+  
+  const loginMutation = useLogin()
+  const registerMutation = useRegister()
+
+  const login = async (data: LoginRequest) => {
+    setLoading(true)
+    try {
+      const response = await loginMutation.mutateAsync(data)
+      if (response.success && response.data) {
+        setAuth(response.data.user, response.data.token)
+        return { success: true, message: response.message }
+      }
+      return { success: false, error: response.error || 'Giriş başarısız' }
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Beklenmeyen hata' 
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const register = async (data: RegisterRequest) => {
+    setLoading(true)
+    try {
+      const response = await registerMutation.mutateAsync(data)
+      if (response.success && response.data) {
+        setAuth(response.data.user, response.data.token)
+        return { success: true, message: response.message }
+      }
+      return { success: false, error: response.error || 'Kayıt başarısız' }
+    } catch (error) {
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Beklenmeyen hata' 
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const logout = () => {
+    clearAuth()
+  }
+
+  return {
+    // State
+    user,
+    isAuthenticated,
+    isLoading: useAuthStore(state => state.isLoading),
+    
+    // Actions
+    login,
+    register,
+    logout,
+    
+    // Mutation states
+    isLoginPending: loginMutation.isPending,
+    isRegisterPending: registerMutation.isPending,
+  }
+} 

@@ -3,7 +3,7 @@ import { Header } from '@/components/common/Header'
 
 export function RootLayout() {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen min-w-screen bg-background flex flex-col">
       <Header />
       <main className="flex-1 w-full px-4 py-8">
         <Outlet />
