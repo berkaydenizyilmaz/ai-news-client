@@ -4,6 +4,10 @@ import { HomePage } from '@/components/common/HomePage'
 import { NotFoundPage } from '@/components/common/NotFoundPage'
 import { LoginForm, RegisterForm } from '@/features/authentication'
 
+/**
+ * React Router kullanarak uygulama yönlendirici yapılandırması
+ * Tüm rotaları ve bunlara karşılık gelen bileşenleri tanımlar
+ */
 export const router = createBrowserRouter([
   {
     path: '/',

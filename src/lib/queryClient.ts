@@ -1,10 +1,19 @@
 import { QueryClient } from '@tanstack/react-query'
 import type { ApiError } from './types'
 
+/**
+ * Bir hatanın ApiError olup olmadığını kontrol eden tip koruyucusu
+ * @param error - Kontrol edilecek hata
+ * @returns Hata ApiError ise true döner
+ */
 const isApiError = (error: unknown): error is ApiError => {
   return typeof error === 'object' && error !== null && 'message' in error
 }
 
+/**
+ * Optimize edilmiş varsayılanlarla yapılandırılmış TanStack Query istemcisi
+ * Yeniden deneme mantığı, hata işleme ve önbellek yapılandırması içerir
+ */
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

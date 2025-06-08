@@ -3,6 +3,12 @@ import { Button } from '@/components/ui/button'
 import { ThemeToggle } from './ThemeToggle'
 import { useAuth } from '@/features/authentication'
 
+/**
+ * Uygulama başlık bileşeni
+ * Logo, navigasyon menüsü, tema değiştirici ve kimlik doğrulama butonlarını içerir
+ * Kullanıcının giriş durumuna göre farklı UI gösterir
+ * @returns Uygulama başlığı için JSX elementi
+ */
 export function Header() {
   const { isAuthenticated, user, logout } = useAuth()
 

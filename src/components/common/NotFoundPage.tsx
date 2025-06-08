@@ -2,6 +2,12 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
+/**
+ * 404 sayfa bulunamadı bileşeni
+ * Geçersiz rotalar için kullanıcı dostu bir hata sayfası sağlar
+ * Ana sayfaya dönüş ve geri gitme seçenekleri içerir
+ * @returns 404 hata sayfası için JSX elementi
+ */
 export function NotFoundPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

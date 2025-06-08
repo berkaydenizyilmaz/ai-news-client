@@ -7,6 +7,11 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '../hooks/useAuth'
 import type { RegisterRequest } from '../types'
 
+/**
+ * Kayıt formu bileşeni
+ * Kullanıcı adı, e-posta ve şifre ile kullanıcı kaydı arayüzü sağlar
+ * @returns Kayıt formu için JSX elementi
+ */
 export function RegisterForm() {
   const navigate = useNavigate()
   const { register, isRegisterPending } = useAuth()
@@ -17,6 +22,10 @@ export function RegisterForm() {
   })
   const [error, setError] = useState<string>('')
 
+  /**
+   * Kullanıcı kaydı için form gönderimini işler
+   * @param e - Form gönderim olayı
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -29,6 +38,10 @@ export function RegisterForm() {
     }
   }
 
+  /**
+   * Input alanı değişikliklerini işler
+   * @param e - Input değişiklik olayı
+   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,

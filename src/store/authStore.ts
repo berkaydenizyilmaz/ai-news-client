@@ -2,22 +2,43 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User } from '@/features/authentication/types'
 
+/**
+ * Kimlik doğrulama durumu arayüzü
+ */
 interface AuthState {
+  /** Mevcut kimlik doğrulanmış kullanıcı */
   user: User | null
+  /** Kimlik doğrulama token'ı */
   token: string | null
+  /** Kullanıcının kimlik doğrulanıp doğrulanmadığı */
   isAuthenticated: boolean
+  /** Auth işlemleri için yükleme durumu */
   isLoading: boolean
 }
 
+/**
+ * Kimlik doğrulama eylemleri arayüzü
+ */
 interface AuthActions {
+  /** Kullanıcı kimlik doğrulama verilerini ayarla */
   setAuth: (user: User, token: string) => void
+  /** Kimlik doğrulama verilerini temizle */
   clearAuth: () => void
+  /** Yükleme durumunu ayarla */
   setLoading: (loading: boolean) => void
+  /** Kullanıcı verilerini kısmen güncelle */
   updateUser: (user: Partial<User>) => void
 }
 
+/**
+ * Birleştirilmiş auth store tipi
+ */
 type AuthStore = AuthState & AuthActions
 
+/**
+ * Kimlik doğrulama durum yönetimi için Zustand store'u
+ * Kullanıcı verilerini ve token'ı localStorage'a kalıcı olarak kaydeder
+ */
 export const useAuthStore = create<AuthStore>()(
   persist(
     (set, get) => ({

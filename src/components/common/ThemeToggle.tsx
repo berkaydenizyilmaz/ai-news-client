@@ -8,6 +8,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useTheme } from '@/hooks/useTheme'
 
+/**
+ * Tema değiştirici bileşeni
+ * Kullanıcının açık, koyu ve sistem teması arasında geçiş yapmasını sağlar
+ * @returns Tema değiştirici dropdown menü için JSX elementi
+ */
 export function ThemeToggle() {
   const { setTheme } = useTheme()
 

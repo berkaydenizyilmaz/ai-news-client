@@ -2,12 +2,22 @@ import { useAuthStore } from '@/store/authStore'
 import { useLogin, useRegister } from '../services/authApi'
 import type { LoginRequest, RegisterRequest } from '../types'
 
+/**
+ * Kimlik doğrulama işlemleri için özel hook
+ * Giriş, kayıt, çıkış işlevselliği ve auth durumu sağlar
+ * @returns Kimlik doğrulama durumu ve metodları
+ */
 export const useAuth = () => {
   const { user, isAuthenticated, setAuth, clearAuth, setLoading } = useAuthStore()
   
   const loginMutation = useLogin()
   const registerMutation = useRegister()
 
+  /**
+   * Kullanıcıyı e-posta ve şifre ile kimlik doğrulaması yapar
+   * @param data - Giriş kimlik bilgileri
+   * @returns Başarı durumu ve mesaj/hata ile Promise
+   */
   const login = async (data: LoginRequest) => {
     setLoading(true)
     try {
@@ -27,6 +37,11 @@ export const useAuth = () => {
     }
   }
 
+  /**
+   * Yeni bir kullanıcı hesabı kaydeder
+   * @param data - Kayıt verileri
+   * @returns Başarı durumu ve mesaj/hata ile Promise
+   */
   const register = async (data: RegisterRequest) => {
     setLoading(true)
     try {
@@ -46,6 +61,9 @@ export const useAuth = () => {
     }
   }
 
+  /**
+   * Mevcut kullanıcıyı çıkış yapar
+   */
   const logout = () => {
     clearAuth()
   }

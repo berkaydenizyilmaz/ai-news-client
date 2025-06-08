@@ -1,11 +1,22 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
+/**
+ * Varsayılan hata fallback bileşeni props arayüzü
+ */
 interface DefaultErrorFallbackProps {
+  /** Oluşan hata (opsiyonel) */
   error?: Error
+  /** Hatayı sıfırlamak için fonksiyon */
   resetError: () => void
 }
 
+/**
+ * Varsayılan hata fallback bileşeni
+ * Error Boundary tarafından yakalanan hatalar için kullanıcı dostu bir arayüz sağlar
+ * @param props - Bileşen props'ları
+ * @returns Hata fallback UI için JSX elementi
+ */
 export function DefaultErrorFallback({ error, resetError }: DefaultErrorFallbackProps) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
