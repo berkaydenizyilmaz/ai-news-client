@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,8 +9,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Save, X } from 'lucide-react';
 import { useRssSource } from '../services/rss-api';
+import { useCategories } from '../services/category-api';
 import { useRss } from '../hooks/use-rss';
 import type { CreateRssSourceRequest, UpdateRssSourceRequest } from '../types';
 
@@ -36,6 +38,7 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
 
   const isEditing = !!sourceId;
   const { data: existingSource, isLoading: isLoadingSource } = useRssSource(sourceId || '');
+  const { data: categories, isLoading: isLoadingCategories } = useCategories();
   const { createRssSource, updateRssSource } = useRss();
 
   const {
@@ -45,6 +48,7 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
     reset,
     setValue,
     watch,
+    control,
   } = useForm<RssSourceFormData>({
     resolver: zodResolver(rssSourceSchema),
     defaultValues: {
@@ -173,14 +177,37 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category_id">Kategori ID</Label>
-            <Input
-              id="category_id"
-              placeholder="Kategori UUID (opsiyonel)"
-              {...register('category_id')}
+            <Label htmlFor="category_id">Kategori</Label>
+            <Controller
+              name="category_id"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value || ''}
+                  onValueChange={(value) => field.onChange(value === 'none' ? '' : value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kategori seçiniz (opsiyonel)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Kategori yok</SelectItem>
+                    {isLoadingCategories ? (
+                      <SelectItem value="loading" disabled>
+                        Kategoriler yükleniyor...
+                      </SelectItem>
+                    ) : (
+                      categories?.map((category) => (
+                        <SelectItem key={category.id} value={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              )}
             />
             <p className="text-sm text-muted-foreground">
-              Belirli bir kategoriye atamak için kategori UUID'sini giriniz
+              RSS kaynağını belirli bir kategoriye atayabilirsiniz
             </p>
           </div>
 

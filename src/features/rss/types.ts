@@ -70,7 +70,7 @@ export interface RssSourceQuery {
 
 export interface RssSourcesResponse {
   sources: RssSource[];
-  pagination: {
+  pagination?: {
     current_page: number;
     total_pages: number;
     total_items: number;

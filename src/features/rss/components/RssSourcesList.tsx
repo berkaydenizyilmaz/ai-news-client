@@ -157,7 +157,7 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
       )}
 
       {/* RSS Sources Grid */}
-      {data && (
+      {data && data.sources && (
         <>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {data.sources.map((source) => (
@@ -232,12 +232,12 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
           </div>
 
           {/* Pagination */}
-          {data.pagination.total_pages > 1 && (
+          {data.pagination && data.pagination.total_pages > 1 && (
             <div className="flex justify-center items-center gap-2">
               <Button
                 variant="outline"
-                onClick={() => handlePageChange(data.pagination.current_page - 1)}
-                disabled={!data.pagination.has_prev}
+                onClick={() => handlePageChange(data!.pagination!.current_page - 1)}
+                disabled={!data!.pagination!.has_prev}
               >
                 Önceki
               </Button>
@@ -246,7 +246,7 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
               </span>
               <Button
                 variant="outline"
-                onClick={() => handlePageChange(data.pagination.current_page + 1)}
+                onClick={() => handlePageChange(data!.pagination!.current_page + 1)}
                 disabled={!data.pagination.has_next}
               >
                 Sonraki
@@ -255,7 +255,7 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
           )}
 
           {/* Empty State */}
-          {data.sources.length === 0 && (
+          {data.sources && data.sources.length === 0 && (
             <Card>
               <CardContent className="text-center py-8">
                 <p className="text-muted-foreground">
