@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
  * Hero bölümü, örnek haberler ve istatistikler içerir
  * @returns Ana sayfa için JSX elementi
  */
-export function HomePage() {
+function HomePage() {
   return (
     <div className="space-y-8">
       {/* Hero Section */}
@@ -66,4 +66,6 @@ export function HomePage() {
       </section>
     </div>
   )
-} 
+}
+
+export default HomePage 

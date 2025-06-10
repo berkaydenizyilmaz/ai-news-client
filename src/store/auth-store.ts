@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { logService } from '@/lib/logService'
+import { logService } from '@/lib/log-service'
 import type { User } from '@/features/authentication/types'
 
 /**

@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useAuthStore } from '@/store/authStore'
-import { useLogin, useRegister } from '../services/authApi'
+import { useAuthStore } from '@/store/auth-store'
+import { useLogin, useRegister } from '../services/auth-api'
 import type { LoginRequest, RegisterRequest } from '../types'
 
 /**

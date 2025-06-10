@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
  * Ana sayfaya dönüş ve geri gitme seçenekleri içerir
  * @returns 404 hata sayfası için JSX elementi
  */
-export function NotFoundPage() {
+function NotFoundPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full text-center">
@@ -32,4 +32,6 @@ export function NotFoundPage() {
       </Card>
     </div>
   )
-} 
+}
+
+export default NotFoundPage 

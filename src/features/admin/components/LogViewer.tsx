@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { useLogs, useDeleteLog } from '@/features/admin/services/logApi'
-import type { LogQuery, LogLevel, LogModule } from '@/features/admin/types'
+import { useLogs, useDeleteLog } from '../services/log-api'
+import type { LogQuery, LogLevel, LogModule } from '../types'
 import { Trash2, Search, AlertTriangle, Info, Bug, ChevronLeft, ChevronRight } from 'lucide-react'
 
 /**

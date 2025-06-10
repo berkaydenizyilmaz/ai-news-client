@@ -1,10 +1,8 @@
 // Components
 export { AdminSidebar } from './components/AdminSidebar'
 export { AdminLayout } from './components/AdminLayout'
-
-// Pages
-export { AdminHome } from './components/pages/AdminHome'
-export { LogViewer } from './components/pages/LogViewer'
+export { AdminHome } from './components/AdminHome'
+export { LogViewer } from './components/LogViewer'
 
 // API Services
 export { 
@@ -13,7 +11,7 @@ export {
   useLogStats, 
   useDeleteLog, 
   useClearLogs 
-} from './services/logApi'
+} from './services/log-api'
 
 // Types
 export type { 

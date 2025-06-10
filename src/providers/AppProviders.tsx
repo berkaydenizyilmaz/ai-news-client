@@ -2,7 +2,7 @@ import { RouterProvider } from 'react-router-dom'
 import { QueryProvider } from './QueryProvider'
 import { ThemeProvider } from './ThemeProvider'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
-import { router } from '@/lib/router'
+import { router } from '@/router'
 
 /**
  * Ana uygulama sağlayıcıları sarmalayıcısı

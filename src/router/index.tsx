@@ -1,10 +1,12 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { RootLayout } from '@/components/common/RootLayout'
-import { HomePage } from '@/components/common/HomePage'
-import { NotFoundPage } from '@/components/common/NotFoundPage'
-import { LoginForm, RegisterForm } from '@/features/authentication'
-import { AdminHome, LogViewer, AdminLayout } from '@/features/admin'
-import { requireAdmin, redirectIfAuthenticated } from './authLoader'
+import HomePage from '@/pages/HomePage'
+import NotFoundPage from '@/pages/NotFoundPage'
+import LoginPage from '@/pages/auth/LoginPage'
+import RegisterPage from '@/pages/auth/RegisterPage'
+import AdminHomePage from '@/pages/admin/AdminHomePage'
+import LogViewerPage from '@/pages/admin/LogViewerPage'
+import { requireAdmin, redirectIfAuthenticated } from './auth-loader'
 
 /**
  * React Router kullanarak uygulama yönlendirici yapılandırması
@@ -28,21 +30,21 @@ export const router = createBrowserRouter([
   {
     path: 'admin',
     loader: requireAdmin,
-    element: <AdminLayout><AdminHome /></AdminLayout>,
+    element: <AdminHomePage />,
   },
   {
     path: 'admin/logs',
     loader: requireAdmin,
-    element: <AdminLayout><LogViewer /></AdminLayout>,
+    element: <LogViewerPage />,
   },
   {
     path: 'login',
     loader: redirectIfAuthenticated,
-    element: <LoginForm />,
+    element: <LoginPage />,
   },
   {
     path: 'register',
     loader: redirectIfAuthenticated,
-    element: <RegisterForm />,
+    element: <RegisterPage />,
   },
 ]) 

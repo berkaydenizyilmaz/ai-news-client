@@ -1,4 +1,4 @@
-import type { LogLevel, LogModule } from '@/lib/logService'
+import type { LogLevel, LogModule } from '@/lib/log-service'
 
 // Re-export types for easier access
 export type { LogLevel, LogModule }
