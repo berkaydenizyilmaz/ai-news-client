@@ -6,6 +6,7 @@ import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
 import AdminHomePage from '@/pages/admin/AdminHomePage'
 import LogViewerPage from '@/pages/admin/LogViewerPage'
+import { RssPage } from '@/pages/admin/RssPage'
 import { requireAdmin, redirectIfAuthenticated } from './auth-loader'
 
 /**
@@ -36,6 +37,11 @@ export const router = createBrowserRouter([
     path: 'admin/logs',
     loader: requireAdmin,
     element: <LogViewerPage />,
+  },
+  {
+    path: 'admin/rss',
+    loader: requireAdmin,
+    element: <RssPage />,
   },
   {
     path: 'login',

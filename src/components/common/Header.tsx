@@ -29,6 +29,7 @@ export function Header() {
             <Link to="/" className="text-foreground/60 hover:text-foreground transition-colors">
               Ana Sayfa
             </Link>
+
             <Link to="/categories" className="text-foreground/60 hover:text-foreground transition-colors">
               Kategoriler
             </Link>

@@ -7,7 +7,8 @@ import {
   BarChart3, 
   Settings,
   Activity,
-  Shield
+  Shield,
+  Rss
 } from 'lucide-react'
 
 /**
@@ -23,6 +24,13 @@ export function AdminHome() {
   ]
 
   const quickActions = [
+    {
+      title: 'RSS Kaynakları',
+      description: 'RSS kaynaklarını yönet ve beslemeleri çek',
+      href: '/admin/rss',
+      icon: Rss,
+      color: 'bg-orange-50 hover:bg-orange-100 dark:bg-orange-950 dark:hover:bg-orange-900'
+    },
     {
       title: 'Log Görüntüleyici',
       description: 'Sistem loglarını görüntüle ve analiz et',
@@ -49,7 +57,7 @@ export function AdminHome() {
       description: 'Güvenlik ayarları ve izleme',
       href: '/admin/security',
       icon: Shield,
-      color: 'bg-orange-50 hover:bg-orange-100 dark:bg-orange-950 dark:hover:bg-orange-900'
+      color: 'bg-red-50 hover:bg-red-100 dark:bg-red-950 dark:hover:bg-red-900'
     }
   ]
 
