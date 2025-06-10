@@ -1,6 +1,8 @@
 // Components
 export { AdminHome } from './components/AdminHome'
 export { LogViewer } from './components/LogViewer'
+export { AdminSidebar } from './components/AdminSidebar'
+export { AdminLayout } from './components/AdminLayout'
 
 // API Services
 export { 

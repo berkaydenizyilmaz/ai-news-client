@@ -3,7 +3,7 @@ import { RootLayout } from '@/components/common/RootLayout'
 import { HomePage } from '@/components/common/HomePage'
 import { NotFoundPage } from '@/components/common/NotFoundPage'
 import { LoginForm, RegisterForm } from '@/features/authentication'
-import { AdminHome, LogViewer } from '@/features/admin'
+import { AdminHome, LogViewer, AdminLayout } from '@/features/admin'
 import { requireAdmin, redirectIfAuthenticated } from './authLoader'
 
 /**
@@ -20,20 +20,20 @@ export const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: 'admin',
-        loader: requireAdmin,
-        element: <AdminHome />,
-      },
-      {
-        path: 'admin/logs',
-        loader: requireAdmin,
-        element: <LogViewer />,
-      },
-      {
         path: '*',
         element: <NotFoundPage />,
       },
     ],
+  },
+  {
+    path: 'admin',
+    loader: requireAdmin,
+    element: <AdminLayout><AdminHome /></AdminLayout>,
+  },
+  {
+    path: 'admin/logs',
+    loader: requireAdmin,
+    element: <AdminLayout><LogViewer /></AdminLayout>,
   },
   {
     path: 'login',
