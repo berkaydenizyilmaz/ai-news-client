@@ -32,6 +32,6 @@ function NotFoundPage() {
       </Card>
     </div>
   )
-}
+} 
 
 export default NotFoundPage 
