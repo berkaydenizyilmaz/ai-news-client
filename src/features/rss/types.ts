@@ -1,40 +1,26 @@
 // RSS Feature Types
-export interface NewsCategory {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface RssSource {
   id: string;
   name: string;
   url: string;
   description?: string;
-  category_id?: string;
   is_active: boolean;
   last_fetched_at?: string;
   created_by?: string;
   created_at: string;
   updated_at: string;
-  category?: NewsCategory;
 }
 
 export interface CreateRssSourceRequest {
   name: string;
   url: string;
   description?: string;
-  category_id?: string;
 }
 
 export interface UpdateRssSourceRequest {
   name?: string;
   url?: string;
   description?: string;
-  category_id?: string;
   is_active?: boolean;
 }
 
@@ -63,7 +49,6 @@ export interface RssFetchResult {
 export interface RssSourceQuery {
   page?: number;
   limit?: number;
-  category_id?: string;
   is_active?: boolean;
   search?: string;
 }

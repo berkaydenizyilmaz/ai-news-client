@@ -1,18 +1,24 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Search, Plus, RefreshCw, ExternalLink, Calendar, Tag } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { 
+  Search, 
+  Plus, 
+  RefreshCw, 
+  ExternalLink, 
+  Calendar
+} from 'lucide-react';
 import { useRssSources } from '../services/rss-api';
 import { useRss } from '../hooks/use-rss';
 import type { RssSourceQuery } from '../types';
 
 interface RssSourcesListProps {
   onCreateClick?: () => void;
-  onEditClick?: (id: string) => void;
+  onEditClick?: (sourceId: string) => void;
 }
 
 export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListProps) => {
@@ -179,6 +185,7 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
                     </div>
                   </div>
                 </CardHeader>
+                
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <ExternalLink className="h-4 w-4" />
@@ -191,13 +198,6 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
                       {source.url}
                     </a>
                   </div>
-
-                  {source.category && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <Tag className="h-4 w-4" />
-                      <Badge variant="outline">{source.category.name}</Badge>
-                    </div>
-                  )}
 
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
@@ -233,44 +233,47 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
 
           {/* Pagination */}
           {data.pagination && data.pagination.total_pages > 1 && (
-            <div className="flex justify-center items-center gap-2">
+            <div className="flex justify-center gap-2">
               <Button
                 variant="outline"
-                onClick={() => handlePageChange(data!.pagination!.current_page - 1)}
-                disabled={!data!.pagination!.has_prev}
+                onClick={() => handlePageChange(query.page! - 1)}
+                disabled={!data.pagination.has_prev}
               >
                 Önceki
               </Button>
-              <span className="text-sm text-muted-foreground">
+              <span className="flex items-center px-4 text-sm text-muted-foreground">
                 Sayfa {data.pagination.current_page} / {data.pagination.total_pages}
               </span>
               <Button
                 variant="outline"
-                onClick={() => handlePageChange(data!.pagination!.current_page + 1)}
+                onClick={() => handlePageChange(query.page! + 1)}
                 disabled={!data.pagination.has_next}
               >
                 Sonraki
               </Button>
             </div>
           )}
-
-          {/* Empty State */}
-          {data.sources && data.sources.length === 0 && (
-            <Card>
-              <CardContent className="text-center py-8">
-                <p className="text-muted-foreground">
-                  {query.search ? 'Arama kriterlerinize uygun RSS kaynağı bulunamadı.' : 'Henüz RSS kaynağı eklenmemiş.'}
-                </p>
-                {isAdmin && onCreateClick && !query.search && (
-                  <Button onClick={onCreateClick} className="mt-4">
-                    <Plus className="h-4 w-4 mr-2" />
-                    İlk RSS Kaynağını Ekle
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          )}
         </>
+      )}
+
+      {/* Empty State */}
+      {data && data.sources && data.sources.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <p className="text-muted-foreground mb-4">
+              {query.search || query.is_active !== undefined 
+                ? 'Filtrelere uygun RSS kaynağı bulunamadı'
+                : 'Henüz RSS kaynağı eklenmemiş'
+              }
+            </p>
+            {isAdmin && onCreateClick && (
+              <Button onClick={onCreateClick}>
+                <Plus className="h-4 w-4 mr-2" />
+                İlk RSS Kaynağını Ekle
+              </Button>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,10 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Save, X } from 'lucide-react';
 import { useRssSource } from '../services/rss-api';
-import { useCategories } from '../services/category-api';
 import { useRss } from '../hooks/use-rss';
 import type { CreateRssSourceRequest, UpdateRssSourceRequest } from '../types';
 
@@ -20,7 +18,6 @@ const rssSourceSchema = z.object({
   name: z.string().min(1, 'Kaynak adı gereklidir').max(255, 'Kaynak adı çok uzun'),
   url: z.string().url('Geçerli bir URL giriniz'),
   description: z.string().max(500, 'Açıklama çok uzun').optional().or(z.literal('')),
-  category_id: z.string().optional().or(z.literal('')),
   is_active: z.boolean(),
 });
 
@@ -38,7 +35,6 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
 
   const isEditing = !!sourceId;
   const { data: existingSource, isLoading: isLoadingSource } = useRssSource(sourceId || '');
-  const { data: categories, isLoading: isLoadingCategories } = useCategories();
   const { createRssSource, updateRssSource } = useRss();
 
   const {
@@ -48,7 +44,6 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
     reset,
     setValue,
     watch,
-    control,
   } = useForm<RssSourceFormData>({
     resolver: zodResolver(rssSourceSchema),
     defaultValues: {
@@ -68,7 +63,6 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
         name: existingSource.name,
         url: existingSource.url,
         description: existingSource.description || '',
-        category_id: existingSource.category_id || '',
         is_active: existingSource.is_active,
       });
     }
@@ -84,7 +78,6 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
           name: data.name,
           url: data.url,
           description: data.description || undefined,
-          category_id: data.category_id || undefined,
           is_active: data.is_active,
         };
         await updateRssSource.mutateAsync(sourceId, updateData);
@@ -93,7 +86,6 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
           name: data.name,
           url: data.url,
           description: data.description || undefined,
-          category_id: data.category_id || undefined,
         };
         await createRssSource.mutateAsync(createData);
       }
@@ -176,41 +168,6 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="category_id">Kategori</Label>
-            <Controller
-              name="category_id"
-              control={control}
-              render={({ field }) => (
-                <Select
-                  value={field.value || ''}
-                  onValueChange={(value) => field.onChange(value === 'none' ? '' : value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kategori seçiniz (opsiyonel)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Kategori yok</SelectItem>
-                    {isLoadingCategories ? (
-                      <SelectItem value="loading" disabled>
-                        Kategoriler yükleniyor...
-                      </SelectItem>
-                    ) : (
-                      categories?.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <p className="text-sm text-muted-foreground">
-              RSS kaynağını belirli bir kategoriye atayabilirsiniz
-            </p>
-          </div>
-
           <div className="flex items-center space-x-2">
             <Switch
               id="is_active"
@@ -231,12 +188,12 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
               {isSubmitting ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  {isEditing ? 'Güncelleniyor...' : 'Ekleniyor...'}
+                  {isEditing ? 'Güncelleniyor...' : 'Oluşturuluyor...'}
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  {isEditing ? 'Güncelle' : 'Ekle'}
+                  {isEditing ? 'Güncelle' : 'Oluştur'}
                 </>
               )}
             </Button>

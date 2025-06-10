@@ -28,7 +28,6 @@ export const useRssSources = (params?: RssSourceQuery) => {
       
       if (params?.page) searchParams.append('page', params.page.toString());
       if (params?.limit) searchParams.append('limit', params.limit.toString());
-      if (params?.category_id) searchParams.append('category_id', params.category_id);
       if (params?.is_active !== undefined) searchParams.append('is_active', params.is_active.toString());
       if (params?.search) searchParams.append('search', params.search);
 
