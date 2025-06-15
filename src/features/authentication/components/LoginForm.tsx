@@ -127,8 +127,6 @@ export function LoginForm() {
                 />
               </div>
 
-
-
               <Button 
                 type="submit" 
                 className="w-full h-12 text-base font-medium" 

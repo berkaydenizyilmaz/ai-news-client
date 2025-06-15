@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { useLogs, useDeleteLog } from '../services/log-api'
+import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { LogQuery, LogLevel, LogModule } from '../types'
 import { Trash2, Search, AlertTriangle, Info, Bug, ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -44,6 +45,7 @@ export function LogViewer () {
 
   const { data: logsData, isLoading, error } = useLogs(filters)
   const deleteLogMutation = useDeleteLog()
+  const { handleError } = useErrorHandler()
 
   const logs = logsData?.data?.logs || []
   const pagination = logsData?.data?.pagination
@@ -88,11 +90,12 @@ export function LogViewer () {
   }
 
   if (error) {
+    const errorMessage = handleError(error)
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center text-destructive">
           <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
-          <p>Loglar yüklenirken hata oluştu</p>
+          <p>{errorMessage}</p>
         </div>
       </div>
     )

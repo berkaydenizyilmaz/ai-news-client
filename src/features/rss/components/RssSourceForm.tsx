@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Save, X } from 'lucide-react';
 import { useRssSource } from '../services/rss-api';
 import { useRss } from '../hooks/use-rss';
+import { useErrorHandler } from '@/hooks/use-error-handler';
 import type { CreateRssSourceRequest, UpdateRssSourceRequest } from '../types';
 
 const rssSourceSchema = z.object({
@@ -36,6 +37,7 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
   const isEditing = !!sourceId;
   const { data: existingSource, isLoading: isLoadingSource } = useRssSource(sourceId || '');
   const { createRssSource, updateRssSource } = useRss();
+  const { handleError } = useErrorHandler();
 
   const {
     register,
@@ -92,7 +94,8 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
       
       onSuccess?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Bir hata oluştu');
+      const errorMessage = handleError(err);
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

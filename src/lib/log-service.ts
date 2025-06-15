@@ -110,9 +110,12 @@ class LogService {
       const response = await apiClient.post('/logs', enrichedLogData)
       return response.data
     } catch (error) {
-      // Log kaydı başarısız olursa console'a yazdır
-      console.error('Log kaydı oluşturulamadı:', error)
-      console.log('Log verisi:', logData)
+      // Log kaydı başarısız olursa sadece development'ta console'a yazdır
+      // Production'da sessizce başarısız ol (log servisi çalışmıyorsa uygulama durmasın)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Log kaydı oluşturulamadı:', error)
+        console.log('Log verisi:', logData)
+      }
     }
   }
 

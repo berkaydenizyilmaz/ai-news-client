@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useRssSources } from '../services/rss-api';
 import { useRss } from '../hooks/use-rss';
+import { useErrorHandler } from '@/hooks/use-error-handler';
 import type { RssSourceQuery } from '../types';
 
 interface RssSourcesListProps {
@@ -31,6 +32,7 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
 
   const { data, isLoading, error } = useRssSources(query);
   const { fetchRssFeeds, isAdmin } = useRss();
+  const { handleError } = useErrorHandler();
 
   const handleSearch = () => {
     setQuery(prev => ({ ...prev, search: search.trim() || undefined, page: 1 }));
@@ -48,7 +50,7 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
     try {
       await fetchRssFeeds.mutateAsync(sourceId ? { source_id: sourceId } : undefined);
     } catch (error) {
-      console.error('RSS çekme hatası:', error);
+      handleError(error);
     }
   };
 

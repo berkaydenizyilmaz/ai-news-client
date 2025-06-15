@@ -35,11 +35,7 @@ export const useRssSources = (params?: RssSourceQuery) => {
         `/rss/sources?${searchParams.toString()}`
       );
       
-      if (!response.data.success || !response.data.data) {
-        throw new Error(response.data.error || 'RSS kaynakları getirilemedi');
-      }
-      
-      return response.data.data;
+      return response.data.data!;
     },
   });
 };
@@ -50,12 +46,7 @@ export const useRssSource = (id: string) => {
     queryKey: rssKeys.source(id),
     queryFn: async (): Promise<RssSource> => {
       const response = await apiClient.get<ApiResponse<RssSource>>(`/rss/sources/${id}`);
-      
-      if (!response.data.success || !response.data.data) {
-        throw new Error(response.data.error || 'RSS kaynağı bulunamadı');
-      }
-      
-      return response.data.data;
+      return response.data.data!;
     },
     enabled: !!id,
   });
@@ -68,12 +59,7 @@ export const useCreateRssSource = () => {
   return useMutation({
     mutationFn: async (data: CreateRssSourceRequest): Promise<RssSource> => {
       const response = await apiClient.post<ApiResponse<RssSource>>('/rss/sources', data);
-      
-      if (!response.data.success || !response.data.data) {
-        throw new Error(response.data.error || 'RSS kaynağı oluşturulamadı');
-      }
-      
-      return response.data.data;
+      return response.data.data!;
     },
     onSuccess: () => {
       // Invalidate and refetch RSS sources list
@@ -89,12 +75,7 @@ export const useUpdateRssSource = () => {
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: UpdateRssSourceRequest }): Promise<RssSource> => {
       const response = await apiClient.put<ApiResponse<RssSource>>(`/rss/sources/${id}`, data);
-      
-      if (!response.data.success || !response.data.data) {
-        throw new Error(response.data.error || 'RSS kaynağı güncellenemedi');
-      }
-      
-      return response.data.data;
+      return response.data.data!;
     },
     onSuccess: (data, variables) => {
       // Update specific source in cache
@@ -111,11 +92,7 @@ export const useDeleteRssSource = () => {
   
   return useMutation({
     mutationFn: async (id: string): Promise<void> => {
-      const response = await apiClient.delete<ApiResponse<void>>(`/rss/sources/${id}`);
-      
-      if (!response.data.success) {
-        throw new Error(response.data.error || 'RSS kaynağı silinemedi');
-      }
+      await apiClient.delete<ApiResponse<void>>(`/rss/sources/${id}`);
     },
     onSuccess: (_, id) => {
       // Remove from cache
@@ -133,12 +110,7 @@ export const useFetchRssFeeds = () => {
   return useMutation({
     mutationFn: async (data?: RssFetchRequest): Promise<RssFetchResult> => {
       const response = await apiClient.post<ApiResponse<RssFetchResult>>('/rss/fetch', data || {});
-      
-      if (!response.data.success || !response.data.data) {
-        throw new Error(response.data.error || 'RSS çekme işlemi başarısız');
-      }
-      
-      return response.data.data;
+      return response.data.data!;
     },
     onSuccess: () => {
       // Invalidate RSS sources to update last_fetched_at

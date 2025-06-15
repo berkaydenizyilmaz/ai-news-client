@@ -166,7 +166,7 @@ export function RegisterForm() {
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-sm text-muted-foreground">
-            © 2024 AI News. Tüm hakları saklıdır.
+            © 2025 AI News. Tüm hakları saklıdır.
           </p>
         </div>
       </div>
