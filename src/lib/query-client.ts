@@ -1,15 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import { errorService } from './error-service'
-import type { ApiError } from './types'
-
-/**
- * Bir hatanın ApiError olup olmadığını kontrol eden tip koruyucusu
- * @param error - Kontrol edilecek hata
- * @returns Hata ApiError ise true döner
- */
-const isApiError = (error: unknown): error is ApiError => {
-  return typeof error === 'object' && error !== null && 'message' in error
-}
+import { errorService, ErrorType } from './error-service'
 
 /**
  * Optimize edilmiş varsayılanlarla yapılandırılmış TanStack Query istemcisi
@@ -21,13 +11,14 @@ export const queryClient = new QueryClient({
       staleTime: 5 * 60 * 1000, // 5 dakika
       gcTime: 10 * 60 * 1000, // 10 dakika (eski cacheTime)
       retry: (failureCount, error) => {
-        // 401, 403, 404 hatalarında retry yapma
-        if (isApiError(error)) {
-          const status = error.response?.status
-          if (status === 401 || status === 403 || status === 404) {
-            return false
-          }
+        // Error service ile normalize et
+        const normalizedError = errorService.normalizeError(error)
+        
+        // Auth ve client hatalarında retry yapma
+        if (normalizedError.type === ErrorType.AUTH || normalizedError.statusCode === 404) {
+          return false
         }
+        
         return failureCount < 3
       },
       refetchOnWindowFocus: false,

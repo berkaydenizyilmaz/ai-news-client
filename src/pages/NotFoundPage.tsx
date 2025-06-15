@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { navigationService } from '@/lib/navigation-service'
 
 /**
  * 404 sayfa bulunamadı bileşeni
@@ -24,7 +25,7 @@ function NotFoundPage() {
             <Button asChild className="flex-1">
               <Link to="/">Ana Sayfaya Dön</Link>
             </Button>
-            <Button variant="outline" onClick={() => window.history.back()} className="flex-1">
+            <Button variant="outline" onClick={() => navigationService.goBack()} className="flex-1">
               Geri Git
             </Button>
           </div>

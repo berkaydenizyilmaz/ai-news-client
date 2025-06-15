@@ -42,20 +42,4 @@ export interface PaginationInfo {
 
 // ==================== ERROR TYPES ====================
 
-/**
- * API'ye özgü hatalar için genişletilmiş Error arayüzü
- */
-export interface ApiError extends Error {
-  /** HTTP yanıt bilgileri */
-  response?: {
-    /** HTTP durum kodu */
-    status: number;
-    /** Hata detaylarını içeren yanıt verisi */
-    data?: {
-      /** Sunucudan gelen hata mesajı */
-      message?: string;
-      /** Hata kodu veya türü */
-      error?: string;
-    };
-  };
-} 
+// Error types artık src/lib/error-service.ts'de tanımlanmıştır 

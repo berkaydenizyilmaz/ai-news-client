@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { navigationService } from '@/lib/navigation-service'
 
 /**
  * Varsayılan hata fallback bileşeni props arayüzü
@@ -45,7 +46,7 @@ export function DefaultErrorFallback({ error, resetError }: DefaultErrorFallback
             </Button>
             <Button 
               variant="outline" 
-              onClick={() => window.location.reload()} 
+              onClick={() => navigationService.reload()} 
               className="flex-1"
             >
               Sayfayı Yenile
