@@ -25,7 +25,7 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
   const [query, setQuery] = useState<RssSourceQuery>({
     page: 1,
     limit: 10,
-    is_active: true,
+    is_active: undefined,
   });
   const [search, setSearch] = useState('');
 
