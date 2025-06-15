@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
+import { errorService } from './error-service'
 import type { ApiError } from './types'
 
 /**
@@ -32,21 +33,16 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       // Error boundary ile entegrasyon
       throwOnError: (error) => {
-        // 500+ server hatalarını Error Boundary'ye fırlat
-        if (isApiError(error)) {
-          return (error.response?.status ?? 0) >= 500
-        }
-        return false
+        const normalizedError = errorService.normalizeError(error)
+        return errorService.shouldThrowToErrorBoundary(normalizedError)
       },
     },
     mutations: {
       retry: false,
       // Mutation hatalarını da Error Boundary'ye fırlat
       throwOnError: (error) => {
-        if (isApiError(error)) {
-          return (error.response?.status ?? 0) >= 500
-        }
-        return false
+        const normalizedError = errorService.normalizeError(error)
+        return errorService.shouldThrowToErrorBoundary(normalizedError)
       },
     },
   },

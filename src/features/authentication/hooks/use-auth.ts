@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/auth-store'
 import { useLogin, useRegister } from '../services/auth-api'
+import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { LoginRequest, RegisterRequest } from '../types'
 
 /**
@@ -11,6 +12,7 @@ import type { LoginRequest, RegisterRequest } from '../types'
 export const useAuth = () => {
   const queryClient = useQueryClient()
   const { user, isAuthenticated, setAuth, clearAuth, setLoading } = useAuthStore()
+  const { handleError } = useErrorHandler()
   
   const loginMutation = useLogin()
   const registerMutation = useRegister()
@@ -32,7 +34,7 @@ export const useAuth = () => {
     } catch (error) {
       return { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Beklenmeyen hata' 
+        error: handleError(error)
       }
     } finally {
       setLoading(false)
@@ -56,7 +58,7 @@ export const useAuth = () => {
     } catch (error) {
       return { 
         success: false, 
-        error: error instanceof Error ? error.message : 'Beklenmeyen hata' 
+        error: handleError(error)
       }
     } finally {
       setLoading(false)

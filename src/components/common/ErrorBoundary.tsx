@@ -1,5 +1,6 @@
 import React from 'react'
 import { DefaultErrorFallback } from '@/components/common/DefaultErrorFallback'
+import { errorService } from '@/lib/error-service'
 
 /**
  * Error boundary durum arayüzü
@@ -47,6 +48,10 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
    * @param errorInfo - Ek hata bilgileri
    */
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Error service ile normalize et ve logla
+    const normalizedError = errorService.normalizeError(error)
+    errorService.logError(normalizedError)
+    
     console.error('Error Boundary yakaladı:', error, errorInfo)
   }
 
