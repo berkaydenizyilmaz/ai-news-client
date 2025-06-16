@@ -1,11 +1,7 @@
-import { LogViewer, AdminLayout } from '@/features/admin'
+import { LogViewer } from '@/features/admin'
 
 const LogViewerPage = () => {
-  return (
-    <AdminLayout>
-      <LogViewer />
-    </AdminLayout>
-  )
+  return <LogViewer />
 }
 
 export default LogViewerPage 

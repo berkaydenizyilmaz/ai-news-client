@@ -1,11 +1,7 @@
-import { AdminHome, AdminLayout } from '@/features/admin'
+import { AdminHome } from '@/features/admin'
 
 const AdminHomePage = () => {
-  return (
-    <AdminLayout>
-      <AdminHome />
-    </AdminLayout>
-  )
+  return <AdminHome />
 }
 
 export default AdminHomePage 

@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { RootLayout } from '@/components/common/RootLayout'
+import { RootLayout } from '@/router/RootLayout'
 import HomePage from '@/pages/HomePage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import LoginPage from '@/pages/auth/LoginPage'
@@ -11,6 +11,7 @@ import { RssPage } from '@/pages/admin/RssPage'
 import { SettingsPage } from '@/pages/admin/SettingsPage'
 import { UsersPage } from '@/pages/admin/UsersPage'
 import { requireAuth, requireAdmin, redirectIfAuthenticated } from './auth-loader'
+import { AdminLayoutWrapper } from './AdminLayoutWrapper'
 
 // React Router kullanarak uygulama yönlendirici yapılandırması
 // Tüm rotaları ve bunlara karşılık gelen bileşenleri tanımlar
@@ -37,27 +38,29 @@ export const router = createBrowserRouter([
   {
     path: 'admin',
     loader: requireAdmin,
-    element: <AdminHomePage />,
-  },
-  {
-    path: 'admin/logs',
-    loader: requireAdmin,
-    element: <LogViewerPage />,
-  },
-  {
-    path: 'admin/rss',
-    loader: requireAdmin,
-    element: <RssPage />,
-  },
-  {
-    path: 'admin/settings',
-    loader: requireAdmin,
-    element: <SettingsPage />,
-  },
-  {
-    path: 'admin/users',
-    loader: requireAdmin,
-    element: <UsersPage />,
+    element: <AdminLayoutWrapper />,
+    children: [
+      {
+        index: true,
+        element: <AdminHomePage />,
+      },
+      {
+        path: 'logs',
+        element: <LogViewerPage />,
+      },
+      {
+        path: 'rss',
+        element: <RssPage />,
+      },
+      {
+        path: 'settings',
+        element: <SettingsPage />,
+      },
+      {
+        path: 'users',
+        element: <UsersPage />,
+      },
+    ],
   },
   {
     path: 'login',

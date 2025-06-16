@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { RssSourcesList, RssSourceForm, AdminLayout } from '@/features/admin';
+import { RssSourcesList, RssSourceForm } from '@/features/admin';
 
 type ViewMode = 'list' | 'create' | 'edit';
 
@@ -28,7 +28,7 @@ export const RssPage = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       {viewMode === 'list' && (
         <RssSourcesList
           onCreateClick={handleCreateClick}
@@ -43,6 +43,6 @@ export const RssPage = () => {
           onCancel={handleFormCancel}
         />
       )}
-    </AdminLayout>
+    </>
   );
 };

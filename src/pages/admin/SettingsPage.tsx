@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SettingsList, SettingsForm, AdminLayout } from '@/features/admin';
+import { SettingsList, SettingsForm } from '@/features/admin';
 
 type ViewMode = 'list' | 'create' | 'edit';
 
@@ -28,7 +28,7 @@ export const SettingsPage = () => {
   };
 
   return (
-    <AdminLayout>
+    <>
       {viewMode === 'list' && (
         <SettingsList
           onCreateClick={handleCreateClick}
@@ -43,6 +43,6 @@ export const SettingsPage = () => {
           onCancel={handleFormCancel}
         />
       )}
-    </AdminLayout>
+    </>
   );
 }; 
