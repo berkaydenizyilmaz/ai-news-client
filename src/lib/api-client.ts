@@ -3,10 +3,8 @@ import env from '@/config/env'
 import { errorService, ErrorType } from './error-service'
 import { navigationService } from './navigation-service'
 
-/**
- * API istekleri için yapılandırılmış Axios örneği
- * Temel URL ve varsayılan başlıkları içerir
- */
+// API istekleri için yapılandırılmış Axios örneği
+// Temel URL ve varsayılan başlıkları içerir
 export const apiClient = axios.create({
   baseURL: env.API_BASE_URL,
   headers: {
@@ -14,9 +12,7 @@ export const apiClient = axios.create({
   },
 })
 
-/**
- * İstek yakalayıcısı - İsteklere otomatik olarak kimlik doğrulama token'ı ekler
- */
+// İstek yakalayıcısı - İsteklere otomatik olarak kimlik doğrulama token'ı ekler
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token')
@@ -30,9 +26,7 @@ apiClient.interceptors.request.use(
   }
 )
 
-/**
- * Yanıt yakalayıcısı - API hatalarını işler ve normalize eder
- */
+// Yanıt yakalayıcısı - API hatalarını işler ve normalize eder
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {

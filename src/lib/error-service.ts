@@ -1,6 +1,4 @@
-/**
- * Hata türleri enum'u
- */
+// Hata türleri enum'u
 export enum ErrorType {
   NETWORK = 'network',
   AUTH = 'auth',
@@ -10,9 +8,7 @@ export enum ErrorType {
   UNKNOWN = 'unknown'
 }
 
-/**
- * Hata şiddeti seviyeleri
- */
+// Hata şiddeti seviyeleri
 export enum ErrorSeverity {
   LOW = 'low',
   MEDIUM = 'medium',
@@ -20,30 +16,26 @@ export enum ErrorSeverity {
   CRITICAL = 'critical'
 }
 
-/**
- * Standart hata arayüzü
- */
+// Standart hata arayüzü
 export interface AppError {
-  /** Hata türü */
+  // Hata türü
   type: ErrorType
-  /** Hata şiddeti */
+  // Hata şiddeti
   severity: ErrorSeverity
-  /** Kullanıcı dostu mesaj */
+  // Kullanıcı dostu mesaj
   message: string
-  /** Teknik detaylar (opsiyonel) */
+  // Teknik detaylar (opsiyonel)
   details?: string
-  /** HTTP status kodu (varsa) */
+  // HTTP status kodu (varsa)
   statusCode?: number
-  /** Hata kodu */
+  // Hata kodu
   code?: string
-  /** Orijinal hata */
+  // Orijinal hata
   originalError?: Error
 }
 
-/**
- * Backend API'den gelen hata mesajlarına göre mapping
- * API dokümantasyonundaki hata formatlarına uygun
- */
+// Backend API'den gelen hata mesajlarına göre mapping
+// API dokümantasyonundaki hata formatlarına uygun
 const ERROR_MESSAGE_MAP: Record<string, { type: ErrorType; message: string; severity: ErrorSeverity }> = {
   // Authentication errors (API'den gelen mesajlar)
   'Token bulunamadı': {
@@ -84,9 +76,7 @@ const ERROR_MESSAGE_MAP: Record<string, { type: ErrorType; message: string; seve
   }
 }
 
-/**
- * HTTP status koduna göre varsayılan hata mapping'i
- */
+// HTTP status koduna göre varsayılan hata mapping'i
 const STATUS_CODE_MAP: Record<number, { type: ErrorType; message: string; severity: ErrorSeverity }> = {
   400: {
     type: ErrorType.VALIDATION,
@@ -135,16 +125,12 @@ const STATUS_CODE_MAP: Record<number, { type: ErrorType; message: string; severi
   }
 }
 
-/**
- * Hata servis sınıfı
- * Merkezi hata yönetimi, sınıflandırma ve kullanıcı bildirimleri
- */
+// Hata servis sınıfı
+// Merkezi hata yönetimi, sınıflandırma ve kullanıcı bildirimleri
 class ErrorService {
 
 
-  /**
-   * Ham hatayı AppError formatına dönüştürür
-   */
+  // Ham hatayı AppError formatına dönüştürür
   normalizeError(error: unknown): AppError {
     // Zaten normalize edilmiş hata
     if (this.isAppError(error)) {
@@ -223,9 +209,7 @@ class ErrorService {
     }
   }
 
-  /**
-   * Hatanın AppError olup olmadığını kontrol eder
-   */
+  // Hatanın AppError olup olmadığını kontrol eder
   private isAppError(error: unknown): error is AppError {
     return (
       typeof error === 'object' &&
@@ -236,9 +220,7 @@ class ErrorService {
     )
   }
 
-  /**
-   * Hatanın API hatası olup olmadığını kontrol eder
-   */
+  // Hatanın API hatası olup olmadığını kontrol eder
   private isApiError(error: unknown): error is Error & { 
     response?: { 
       status: number; 
@@ -259,9 +241,7 @@ class ErrorService {
     )
   }
 
-  /**
-   * Hatanın kullanıcıya gösterilip gösterilmeyeceğini belirler
-   */
+  // Hatanın kullanıcıya gösterilip gösterilmeyeceğini belirler
   shouldShowToUser(error: AppError): boolean {
     // Kritik hatalar ve auth hataları her zaman gösterilir
     if (error.severity === ErrorSeverity.CRITICAL || error.type === ErrorType.AUTH) {
@@ -281,25 +261,19 @@ class ErrorService {
     return false
   }
 
-  /**
-   * Hatanın Error Boundary'ye fırlatılıp fırlatılmayacağını belirler
-   */
+  // Hatanın Error Boundary'ye fırlatılıp fırlatılmayacağını belirler
   shouldThrowToErrorBoundary(error: AppError): boolean {
     return error.severity === ErrorSeverity.CRITICAL || error.type === ErrorType.SERVER
   }
 
-  /**
-   * Hata için kullanıcı dostu mesaj üretir
-   * Mapping sisteminde mesaj zaten normalize edilmiş olur
-   */
+  // Hata için kullanıcı dostu mesaj üretir
+  // Mapping sisteminde mesaj zaten normalize edilmiş olur
   getUserMessage(error: AppError): string {
     // Mapping sisteminden gelen mesajlar zaten kullanıcı dostu
     return error.message || 'Bir hata oluştu'
   }
 
-  /**
-   * Hatayı konsola loglar (geliştirme ortamında)
-   */
+  // Hatayı konsola loglar (geliştirme ortamında)
   logError(error: AppError): void {
     if (process.env.NODE_ENV === 'development') {
       console.group(`🚨 ${error.type.toUpperCase()} ERROR [${error.severity}]`)

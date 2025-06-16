@@ -1,55 +1,47 @@
 // ==================== AUTH TYPES ====================
 
-/**
- * Kullanıcı varlık arayüzü
- */
+// Kullanıcı varlık arayüzü
 export interface User {
-  /** Benzersiz kullanıcı tanımlayıcısı */
+  // Benzersiz kullanıcı tanımlayıcısı
   id: string;
-  /** Kullanıcının e-posta adresi */
+  // Kullanıcının e-posta adresi
   email: string;
-  /** Kullanıcının görünen adı */
+  // Kullanıcının görünen adı
   username: string;
-  /** Kullanıcının sistemdeki rolü */
+  // Kullanıcının sistemdeki rolü
   role: 'visitor' | 'user' | 'moderator' | 'admin';
-  /** Opsiyonel avatar resim URL'si */
+  // Opsiyonel avatar resim URL'si
   avatar_url?: string;
-  /** Kullanıcı hesabının aktif olup olmadığı */
+  // Kullanıcı hesabının aktif olup olmadığı
   is_active: boolean;
-  /** Hesap oluşturma zaman damgası */
+  // Hesap oluşturma zaman damgası
   created_at: string;
-  /** Son güncelleme zaman damgası */
+  // Son güncelleme zaman damgası
   updated_at: string;
 }
 
-/**
- * Giriş isteği yükü
- */
+// Giriş isteği yükü
 export interface LoginRequest {
-  /** Kullanıcının e-posta adresi */
+  // Kullanıcının e-posta adresi
   email: string;
-  /** Kullanıcının şifresi */
+  // Kullanıcının şifresi
   password: string;
 }
 
-/**
- * Kayıt isteği yükü
- */
+// Kayıt isteği yükü
 export interface RegisterRequest {
-  /** Kullanıcının e-posta adresi */
+  // Kullanıcının e-posta adresi
   email: string;
-  /** Kullanıcının şifresi */
+  // Kullanıcının şifresi
   password: string;
-  /** İstenilen kullanıcı adı */
+  // İstenilen kullanıcı adı
   username: string;
 }
 
-/**
- * Sunucudan gelen kimlik doğrulama yanıtı
- */
+// Sunucudan gelen kimlik doğrulama yanıtı
 export interface AuthResponse {
-  /** Kimlik doğrulanmış kullanıcı verisi */
+  // Kimlik doğrulanmış kullanıcı verisi
   user: User;
-  /** JWT kimlik doğrulama token'ı */
+  // JWT kimlik doğrulama token'ı
   token: string;
 } 

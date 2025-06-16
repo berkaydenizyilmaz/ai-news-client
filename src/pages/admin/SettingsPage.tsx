@@ -1,48 +1,48 @@
 import { useState } from 'react';
-import { RssSourcesList, RssSourceForm, AdminLayout } from '@/features/admin';
+import { SettingsList, SettingsForm, AdminLayout } from '@/features/admin';
 
 type ViewMode = 'list' | 'create' | 'edit';
 
-export const RssPage = () => {
+export const SettingsPage = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [editingSourceId, setEditingSourceId] = useState<string | null>(null);
+  const [editingSettingKey, setEditingSettingKey] = useState<string | null>(null);
 
   const handleCreateClick = () => {
     setViewMode('create');
-    setEditingSourceId(null);
+    setEditingSettingKey(null);
   };
 
-  const handleEditClick = (sourceId: string) => {
+  const handleEditClick = (settingKey: string) => {
     setViewMode('edit');
-    setEditingSourceId(sourceId);
+    setEditingSettingKey(settingKey);
   };
 
   const handleFormSuccess = () => {
     setViewMode('list');
-    setEditingSourceId(null);
+    setEditingSettingKey(null);
   };
 
   const handleFormCancel = () => {
     setViewMode('list');
-    setEditingSourceId(null);
+    setEditingSettingKey(null);
   };
 
   return (
     <AdminLayout>
       {viewMode === 'list' && (
-        <RssSourcesList
+        <SettingsList
           onCreateClick={handleCreateClick}
           onEditClick={handleEditClick}
         />
       )}
       
       {(viewMode === 'create' || viewMode === 'edit') && (
-        <RssSourceForm
-          sourceId={editingSourceId || undefined}
+        <SettingsForm
+          settingKey={editingSettingKey || undefined}
           onSuccess={handleFormSuccess}
           onCancel={handleFormCancel}
         />
       )}
     </AdminLayout>
   );
-};
+}; 

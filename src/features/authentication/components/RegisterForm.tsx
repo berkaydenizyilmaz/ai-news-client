@@ -8,11 +8,8 @@ import { ThemeToggle } from '@/components/common/ThemeToggle'
 import { useAuth } from '../hooks/use-auth'
 import type { RegisterRequest } from '../types'
 
-/**
- * Kayıt formu bileşeni
- * Kullanıcı adı, e-posta ve şifre ile kullanıcı kaydı arayüzü sağlar
- * @returns Kayıt formu için JSX elementi
- */
+// Kayıt formu bileşeni
+// Kullanıcı adı, e-posta ve şifre ile kullanıcı kaydı arayüzü sağlar
 export function RegisterForm() {
   const navigate = useNavigate()
   const { register, isRegisterPending } = useAuth()
@@ -23,10 +20,7 @@ export function RegisterForm() {
   })
   const [error, setError] = useState<string>('')
 
-  /**
-   * Kullanıcı kaydı için form gönderimini işler
-   * @param e - Form gönderim olayı
-   */
+  // Kullanıcı kaydı için form gönderimini işler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -39,10 +33,7 @@ export function RegisterForm() {
     }
   }
 
-  /**
-   * Input alanı değişikliklerini işler
-   * @param e - Input değişiklik olayı
-   */
+  // Input alanı değişikliklerini işler
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,

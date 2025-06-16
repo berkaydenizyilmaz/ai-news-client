@@ -10,10 +10,8 @@ import {
 } from '../services/settings-api'
 import type { CreateSettingRequest, UpdateSettingRequest, BulkUpdateRequest } from '../services/settings-api'
 
-/**
- * Settings yönetimi için merkezi hook
- * Admin yetki kontrolü ve helper fonksiyonlar sağlar
- */
+// Settings yönetimi için merkezi hook
+// Admin yetki kontrolü ve helper fonksiyonlar sağlar
 export const useSettingsManager = () => {
   const { user } = useAuthStore()
   const isAdmin = user?.role === 'admin'

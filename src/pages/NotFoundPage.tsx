@@ -3,12 +3,10 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { navigationService } from '@/lib/navigation-service'
 
-/**
- * 404 sayfa bulunamadı bileşeni
- * Geçersiz rotalar için kullanıcı dostu bir hata sayfası sağlar
- * Ana sayfaya dönüş ve geri gitme seçenekleri içerir
- * @returns 404 hata sayfası için JSX elementi
- */
+// 404 sayfa bulunamadı bileşeni
+// Geçersiz rotalar için kullanıcı dostu bir hata sayfası sağlar
+// Ana sayfaya dönüş ve geri gitme seçenekleri içerir
+// 404 hata sayfası için JSX elementi döner
 function NotFoundPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

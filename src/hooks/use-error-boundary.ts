@@ -2,16 +2,11 @@ import { useQueryErrorResetBoundary } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { errorService } from '@/lib/error-service'
 
-/**
- * TanStack Query ile Error Boundary entegrasyonu için özel hook
- * @returns resetQueries fonksiyonunu içeren nesne
- */
+// TanStack Query ile Error Boundary entegrasyonu için özel hook
 export function useErrorBoundary() {
   const { reset } = useQueryErrorResetBoundary()
 
-  /**
-   * TanStack Query'deki tüm sorgu hatalarını sıfırlar
-   */
+  // TanStack Query'deki tüm sorgu hatalarını sıfırlar
   const resetQueries = () => {
     reset()
   }
@@ -19,10 +14,8 @@ export function useErrorBoundary() {
   return { resetQueries }
 }
 
-/**
- * Asenkron hataları Error Boundary'ye fırlatmak için hook
- * @param error - Fırlatılacak opsiyonel hata
- */
+// Asenkron hataları Error Boundary'ye fırlatmak için hook
+// error - Fırlatılacak opsiyonel hata
 export function useThrowAsyncError(error?: unknown) {
   useEffect(() => {
     if (error) {
@@ -31,7 +24,7 @@ export function useThrowAsyncError(error?: unknown) {
       
       // Sadece Error Boundary'ye fırlatılması gereken hataları fırlat
       if (errorService.shouldThrowToErrorBoundary(normalizedError)) {
-        throw error
+      throw error
       }
     }
   }, [error])

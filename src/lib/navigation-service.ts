@@ -1,13 +1,9 @@
 import { useAuthStore } from '@/store/auth-store'
 
-/**
- * Navigation servis sınıfı
- * Merkezi yönlendirme yönetimi ve auth durumuna göre yönlendirme
- */
+// Navigation servis sınıfı
+// Merkezi yönlendirme yönetimi ve auth durumuna göre yönlendirme
 class NavigationService {
-  /**
-   * Auth hatası durumunda logout ve login sayfasına yönlendirme
-   */
+  // Auth hatası durumunda logout ve login sayfasına yönlendirme
   handleAuthError(): void {
     // Auth store'dan logout işlemini çağır
     const { clearAuth } = useAuthStore.getState()
@@ -20,28 +16,22 @@ class NavigationService {
     }
   }
 
-  /**
-   * Programmatic navigation için yardımcı
-   * Component içinde useNavigate kullanılmalı, bu sadece emergency durumlar için
-   */
+  // Programmatic navigation için yardımcı
+  // Component içinde useNavigate kullanılmalı, bu sadece emergency durumlar için
   redirectTo(path: string): void {
     if (typeof window !== 'undefined') {
       window.location.href = path
     }
   }
 
-  /**
-   * Mevcut sayfayı yeniler
-   */
+  // Mevcut sayfayı yeniler
   reload(): void {
     if (typeof window !== 'undefined') {
       window.location.reload()
     }
   }
 
-  /**
-   * Geri gitme işlemi
-   */
+  // Geri gitme işlemi
   goBack(): void {
     if (typeof window !== 'undefined' && window.history.length > 1) {
       window.history.back()

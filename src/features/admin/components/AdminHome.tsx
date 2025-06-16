@@ -11,10 +11,8 @@ import {
   Rss
 } from 'lucide-react'
 
-/**
- * Admin ana sayfası bileşeni
- * Admin panelinin genel görünümünü ve hızlı erişim linklerini sağlar
- */
+// Admin ana sayfası bileşeni
+// Admin panelinin genel görünümünü ve hızlı erişim linklerini sağlar
 export function AdminHome() {
   const adminStats = [
     { title: 'Toplam Kullanıcı', value: '1,234', icon: Users, color: 'text-blue-600' },

@@ -1,99 +1,138 @@
-import type { LogLevel, LogModule } from '@/lib/log-service'
+// RSS Feature Types
+export interface RssSource {
+  id: string;
+  name: string;
+  url: string;
+  description?: string;
+  is_active: boolean;
+  last_fetched_at?: string;
+  created_by?: string;
+  created_at: string;
+  updated_at: string;
+}
 
-// Re-export types for easier access
-export type { LogLevel, LogModule }
+export interface CreateRssSourceRequest {
+  name: string;
+  url: string;
+  description?: string;
+}
 
-/**
- * Log kaydı arayüzü
- */
+export interface UpdateRssSourceRequest {
+  name?: string;
+  url?: string;
+  description?: string;
+  is_active?: boolean;
+}
+
+export interface RssFetchRequest {
+  source_id?: string;
+  max_items?: number;
+  force_refresh?: boolean;
+}
+
+export interface RssFetchResult {
+  total_sources_processed: number;
+  total_news_fetched: number;
+  new_news_count: number;
+  duplicate_news_count: number;
+  processing_time: number;
+  sources: Array<{
+    source_id: string;
+    source_name: string;
+    news_fetched: number;
+    new_news: number;
+    duplicates: number;
+    errors: string[];
+  }>;
+}
+
+export interface RssSourceQuery {
+  page?: number;
+  limit?: number;
+  is_active?: boolean;
+  search?: string;
+}
+
+export interface RssSourcesResponse {
+  sources: RssSource[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+// Log Feature Types
 export interface Log {
-  id: string
-  level: LogLevel
-  message: string
-  module: LogModule
-  user_id?: string
-  ip_address?: string
-  user_agent?: string
-  metadata?: Record<string, string | number | boolean | null | undefined>
-  created_at: string
+  id: string;
+  level: 'info' | 'warning' | 'error' | 'debug';
+  module: 'auth' | 'rss' | 'news' | 'settings' | 'forum' | 'users' | 'reports' | 'notification';
+  message: string;
+  details?: Record<string, unknown>;
+  user_id?: string;
+  ip_address?: string;
+  user_agent?: string;
+  created_at: string;
 }
 
-/**
- * Sayfalama bilgileri
- */
-export interface PaginationInfo {
-  current_page: number
-  total_pages: number
-  total_items: number
-  items_per_page: number
-  has_next: boolean
-  has_prev: boolean
-}
-
-/**
- * Log listesi yanıtı
- */
 export interface LogsResponse {
-  logs: Log[]
-  pagination: PaginationInfo
+  logs: Log[];
+  pagination: PaginationInfo;
 }
 
-/**
- * Log sorgu parametreleri
- */
 export interface LogQuery {
-  page?: number
-  limit?: number
-  level?: LogLevel
-  module?: LogModule
-  user_id?: string
-  start_date?: string
-  end_date?: string
+  page?: number;
+  limit?: number;
+  level?: 'info' | 'warning' | 'error' | 'debug';
+  module?: 'auth' | 'rss' | 'news' | 'settings' | 'forum' | 'users' | 'reports' | 'notification';
+  start_date?: string;
+  end_date?: string;
+  search?: string;
 }
 
-/**
- * Log istatistikleri sorgu parametreleri
- */
-export interface LogStatsQuery {
-  days?: number
-  module?: LogModule
-}
-
-/**
- * Log istatistikleri
- */
 export interface LogStats {
-  total_logs: number
-  by_level: Record<LogLevel, number>
-  by_module: Record<LogModule, number>
-  daily_counts: Array<{
-    date: string
-    count: number
-  }>
-  period: {
-    start_date: string
-    end_date: string
-    days: number
-  }
+  total_logs: number;
+  logs_by_level: {
+    info: number;
+    warning: number;
+    error: number;
+    debug: number;
+  };
+  logs_by_module: {
+    auth: number;
+    rss: number;
+    news: number;
+    settings: number;
+    forum: number;
+    users: number;
+    reports: number;
+    notification: number;
+  };
+  recent_activity: Array<{
+    date: string;
+    count: number;
+  }>;
 }
 
-/**
- * Eski logları temizleme isteği
- */
+export interface LogStatsQuery {
+  days?: number;
+  level?: 'info' | 'warning' | 'error' | 'debug';
+  module?: 'auth' | 'rss' | 'news' | 'settings' | 'forum' | 'users' | 'reports' | 'notification';
+}
+
 export interface ClearLogsRequest {
-  before_date: string
-  level?: LogLevel
-  module?: LogModule
+  older_than_days?: number;
+  level?: 'info' | 'warning' | 'error' | 'debug';
+  module?: 'auth' | 'rss' | 'news' | 'settings' | 'forum' | 'users' | 'reports' | 'notification';
 }
 
-/**
- * Log temizleme yanıtı
- */
 export interface ClearLogsResponse {
-  deleted_count: number
-  criteria: {
-    before_date: string
-    level?: LogLevel
-    module?: LogModule
-  }
+  deleted_count: number;
+  message: string;
+}
+
+export interface PaginationInfo {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 } 

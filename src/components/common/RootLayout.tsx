@@ -1,12 +1,9 @@
 import { Outlet } from 'react-router-dom'
 import { Header } from '@/components/common/Header'
 
-/**
- * Kök layout bileşeni
- * Uygulamanın ana layout yapısını sağlar (header, main, footer)
- * React Router Outlet ile alt rotaları render eder
- * @returns Ana layout yapısı için JSX elementi
- */
+// Kök layout bileşeni
+// Uygulamanın ana layout yapısını sağlar (header, main, footer)
+// React Router Outlet ile alt rotaları render eder
 export function RootLayout() {
   return (
     <div className="min-h-screen min-w-screen bg-background flex flex-col">

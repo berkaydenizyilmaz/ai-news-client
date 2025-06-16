@@ -1,25 +1,21 @@
 import { useEffect, useState } from 'react'
 import { ThemeProviderContext, type Theme } from '@/lib/theme-context'
 
-/**
- * ThemeProvider bileşeni için props
- */
+// ThemeProvider bileşeni için props
 interface ThemeProviderProps {
-  /** Tema context'i ile sarmalanacak alt bileşenler */
+  // Tema context'i ile sarmalanacak alt bileşenler
   children: React.ReactNode
-  /** Hiçbiri saklanmamışsa kullanılacak varsayılan tema */
+  // Hiçbiri saklanmamışsa kullanılacak varsayılan tema
   defaultTheme?: Theme
-  /** Tema kalıcılığı için localStorage anahtarı */
+  // Tema kalıcılığı için localStorage anahtarı
   storageKey?: string
 }
 
-/**
- * Tema sağlayıcısı bileşeni
- * Tema durumunu yönetir ve belge köküne tema sınıfları uygular
- * localStorage kalıcılığı ile açık, koyu ve sistem temalarını destekler
- * @param props - Bileşen props'ları
- * @returns Tema context sağlayıcısı ile JSX elementi
- */
+// Tema sağlayıcısı bileşeni
+// Tema durumunu yönetir ve belge köküne tema sınıfları uygular
+// localStorage kalıcılığı ile açık, koyu ve sistem temalarını destekler
+// props - Bileşen props'ları
+// Tema context sağlayıcısı ile JSX elementi döner
 export function ThemeProvider({
   children,
   defaultTheme = 'system',

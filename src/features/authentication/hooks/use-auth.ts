@@ -4,11 +4,8 @@ import { useLogin, useRegister } from '../services/auth-api'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { LoginRequest, RegisterRequest } from '../types'
 
-/**
- * Kimlik doğrulama işlemleri için özel hook
- * Giriş, kayıt, çıkış işlevselliği ve auth durumu sağlar
- * @returns Kimlik doğrulama durumu ve metodları
- */
+// Kimlik doğrulama işlemleri için özel hook
+// Giriş, kayıt, çıkış işlevselliği ve auth durumu sağlar
 export const useAuth = () => {
   const queryClient = useQueryClient()
   const { user, isAuthenticated, setAuth, clearAuth, setLoading } = useAuthStore()
@@ -17,11 +14,7 @@ export const useAuth = () => {
   const loginMutation = useLogin()
   const registerMutation = useRegister()
 
-  /**
-   * Kullanıcıyı e-posta ve şifre ile kimlik doğrulaması yapar
-   * @param data - Giriş kimlik bilgileri
-   * @returns Başarı durumu ve mesaj/hata ile Promise
-   */
+  // Kullanıcıyı e-posta ve şifre ile kimlik doğrulaması yapar
   const login = async (data: LoginRequest) => {
     setLoading(true)
     try {
@@ -41,11 +34,7 @@ export const useAuth = () => {
     }
   }
 
-  /**
-   * Yeni bir kullanıcı hesabı kaydeder
-   * @param data - Kayıt verileri
-   * @returns Başarı durumu ve mesaj/hata ile Promise
-   */
+  // Yeni bir kullanıcı hesabı kaydeder
   const register = async (data: RegisterRequest) => {
     setLoading(true)
     try {
@@ -65,10 +54,8 @@ export const useAuth = () => {
     }
   }
 
-  /**
-   * Mevcut kullanıcıyı çıkış yapar
-   * Modern loader pattern sayesinde otomatik yönlendirme yapılır
-   */
+  // Mevcut kullanıcıyı çıkış yapar
+  // Modern loader pattern sayesinde otomatik yönlendirme yapılır
   const logout = () => {
     clearAuth()
     // TanStack Query cache'ini temizle

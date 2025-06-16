@@ -9,9 +9,7 @@ import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { LogQuery, LogLevel, LogModule } from '../types'
 import { Trash2, Search, AlertTriangle, Info, Bug, ChevronLeft, ChevronRight } from 'lucide-react'
 
-/**
- * Log seviyesi için renk ve ikon eşleştirmesi
- */
+// Log seviyesi için renk ve ikon eşleştirmesi
 const logLevelConfig = {
   info: { color: 'bg-blue-500', icon: Info, label: 'Bilgi' },
   warning: { color: 'bg-yellow-500', icon: AlertTriangle, label: 'Uyarı' },
@@ -20,9 +18,7 @@ const logLevelConfig = {
   debug: { color: 'bg-gray-500', icon: Bug, label: 'Debug' },
 } as const
 
-/**
- * Modül etiketleri
- */
+// Modül etiketleri
 const moduleLabels: Record<LogModule, string> = {
   auth: 'Auth',
   rss: 'RSS',
@@ -34,9 +30,7 @@ const moduleLabels: Record<LogModule, string> = {
   notification: 'Notifications',
 }
 
-/**
- * Kompakt log görüntüleme ve yönetim bileşeni
- */
+// Kompakt log görüntüleme ve yönetim bileşeni
 export function LogViewer () {
   const [filters, setFilters] = useState<LogQuery>({
     page: 1,
@@ -51,9 +45,7 @@ export function LogViewer () {
   const pagination = logsData?.data?.pagination
 
 
-  /**
-   * Filtreleri günceller - hata düzeltildi
-   */
+  // Filtreleri günceller - hata düzeltildi
   const updateFilter = (key: keyof LogQuery, value: string | number | undefined) => {
     setFilters(prev => ({
       ...prev,
@@ -62,18 +54,14 @@ export function LogViewer () {
     }))
   }
 
-  /**
-   * Log silme işlemi
-   */
+  // Log silme işlemi
   const handleDeleteLog = async (logId: string) => {
     if (confirm('Bu log kaydını silmek istediğinizden emin misiniz?')) {
       await deleteLogMutation.mutateAsync(logId)
     }
   }
 
-  /**
-   * Kompakt tarih formatı
-   */
+  // Kompakt tarih formatı
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()

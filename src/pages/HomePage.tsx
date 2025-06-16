@@ -1,11 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
-/**
- * Ana sayfa bileşeni
- * Uygulamanın ana sayfasını render eder
- * Hero bölümü, örnek haberler ve istatistikler içerir
- * @returns Ana sayfa için JSX elementi
- */
+// Ana sayfa bileşeni
+// Uygulamanın ana sayfasını render eder
+// Hero bölümü, örnek haberler ve istatistikler içerir
+// Ana sayfa için JSX elementi döner
 function HomePage() {
   return (
     <div className="space-y-8">

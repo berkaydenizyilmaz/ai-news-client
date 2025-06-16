@@ -12,16 +12,11 @@ import type {
   RssSourceQuery,
 } from '../types';
 
-/**
- * RSS API fonksiyonları
- * RSS kaynak yönetimi ve feed çekme işlemleri için kullanılır
- */
+// RSS API fonksiyonları
+// RSS kaynak yönetimi ve feed çekme işlemleri için kullanılır
+
 const rssApi = {
-  /**
-   * RSS kaynaklarını listeler (sayfalama ve filtreleme ile)
-   * @param params - Sorgu parametreleri
-   * @returns RSS kaynakları listesi ile Promise
-   */
+  // RSS kaynaklarını listeler (sayfalama ve filtreleme ile)
   getRssSources: async (params?: RssSourceQuery): Promise<ApiResponse<RssSourcesResponse>> => {
     const searchParams = new URLSearchParams();
     
@@ -37,21 +32,13 @@ const rssApi = {
     return response.data;
   },
 
-  /**
-   * Belirli bir RSS kaynağını ID'ye göre getirir
-   * @param id - RSS kaynak ID'si
-   * @returns RSS kaynak verisi ile Promise
-   */
+  // Belirli bir RSS kaynağını ID'ye göre getirir
   getRssSourceById: async (id: string): Promise<ApiResponse<RssSource>> => {
     const response = await apiClient.get<ApiResponse<RssSource>>(`/rss/sources/${id}`);
     return response.data;
   },
 
-  /**
-   * Yeni RSS kaynağı oluşturur
-   * @param data - RSS kaynak oluşturma verisi
-   * @returns Oluşturulan RSS kaynak ile Promise
-   */
+  // Yeni RSS kaynağı oluşturur
   createRssSource: async (data: CreateRssSourceRequest): Promise<ApiResponse<RssSource>> => {
     try {
       const response = await apiClient.post<ApiResponse<RssSource>>('/rss/sources', data);
@@ -77,12 +64,7 @@ const rssApi = {
     }
   },
 
-  /**
-   * RSS kaynağını günceller
-   * @param id - RSS kaynak ID'si
-   * @param data - Güncelleme verisi
-   * @returns Güncellenmiş RSS kaynak ile Promise
-   */
+  // RSS kaynağını günceller
   updateRssSource: async (id: string, data: UpdateRssSourceRequest): Promise<ApiResponse<RssSource>> => {
     try {
       const response = await apiClient.put<ApiResponse<RssSource>>(`/rss/sources/${id}`, data);
@@ -106,11 +88,7 @@ const rssApi = {
     }
   },
 
-  /**
-   * RSS kaynağını siler
-   * @param id - RSS kaynak ID'si
-   * @returns Silme sonucu ile Promise
-   */
+  // RSS kaynağını siler
   deleteRssSource: async (id: string): Promise<ApiResponse<void>> => {
     try {
       const response = await apiClient.delete<ApiResponse<void>>(`/rss/sources/${id}`);
@@ -131,11 +109,7 @@ const rssApi = {
     }
   },
 
-  /**
-   * RSS kaynaklarından haberleri çeker
-   * @param data - Feed çekme parametreleri
-   * @returns Feed çekme sonucu ile Promise
-   */
+  // RSS kaynaklarından haberleri çeker
   fetchRssFeeds: async (data?: RssFetchRequest): Promise<ApiResponse<RssFetchResult>> => {
     try {
       const response = await apiClient.post<ApiResponse<RssFetchResult>>('/rss/fetch', data || {});
@@ -172,11 +146,7 @@ export const rssKeys = {
 
 // TanStack Query Hooks
 
-/**
- * RSS kaynaklarını getirmek için TanStack Query hook'u
- * @param params - Sorgu parametreleri
- * @returns RSS kaynakları listesi için query nesnesi
- */
+// RSS kaynaklarını getirmek için TanStack Query hook'u
 export const useRssSources = (params?: RssSourceQuery) => {
   return useQuery({
     queryKey: rssKeys.sourcesList(params),
@@ -188,11 +158,7 @@ export const useRssSources = (params?: RssSourceQuery) => {
   });
 };
 
-/**
- * Belirli bir RSS kaynağını getirmek için TanStack Query hook'u
- * @param id - RSS kaynak ID'si
- * @returns RSS kaynak verisi için query nesnesi
- */
+// Belirli bir RSS kaynağını getirmek için TanStack Query hook'u
 export const useRssSource = (id: string) => {
   return useQuery({
     queryKey: rssKeys.source(id),
@@ -204,10 +170,7 @@ export const useRssSource = (id: string) => {
   });
 };
 
-/**
- * Yeni RSS kaynağı oluşturmak için TanStack Query mutation hook'u (Admin Only)
- * @returns RSS kaynak oluşturma işlemi için mutation nesnesi
- */
+// Yeni RSS kaynağı oluşturmak için TanStack Query mutation hook'u (Admin Only)
 export const useCreateRssSource = () => {
   const queryClient = useQueryClient();
   
@@ -224,10 +187,7 @@ export const useCreateRssSource = () => {
   });
 };
 
-/**
- * RSS kaynağını güncellemek için TanStack Query mutation hook'u (Admin Only)
- * @returns RSS kaynak güncelleme işlemi için mutation nesnesi
- */
+// RSS kaynağını güncellemek için TanStack Query mutation hook'u (Admin Only)
 export const useUpdateRssSource = () => {
   const queryClient = useQueryClient();
   
@@ -246,10 +206,7 @@ export const useUpdateRssSource = () => {
   });
 };
 
-/**
- * RSS kaynağını silmek için TanStack Query mutation hook'u (Admin Only)
- * @returns RSS kaynak silme işlemi için mutation nesnesi
- */
+// RSS kaynağını silmek için TanStack Query mutation hook'u (Admin Only)
 export const useDeleteRssSource = () => {
   const queryClient = useQueryClient();
   
@@ -267,10 +224,7 @@ export const useDeleteRssSource = () => {
   });
 };
 
-/**
- * RSS feed çekmek için TanStack Query mutation hook'u (Admin Only)
- * @returns RSS feed çekme işlemi için mutation nesnesi
- */
+// RSS feed çekmek için TanStack Query mutation hook'u (Admin Only)
 export const useFetchRssFeeds = () => {
   const queryClient = useQueryClient();
   

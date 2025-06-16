@@ -1,7 +1,5 @@
-/**
- * Kimlik doğrulama özelliği dışa aktarımları
- * Tüm kimlik doğrulama ile ilgili bileşenler, hook'lar, servisler ve tipleri sağlar
- */
+// Kimlik doğrulama özelliği dışa aktarımları
+// Tüm kimlik doğrulama ile ilgili bileşenler, hook'lar, servisler ve tipleri sağlar
 
 // Components
 export { LoginForm } from './components/LoginForm'

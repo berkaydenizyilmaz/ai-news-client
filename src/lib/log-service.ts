@@ -1,23 +1,15 @@
 import { apiClient } from './api-client'
 
-/**
- * Log seviyeleri
- */
-export type LogLevel = 'info' | 'warn' | 'warning' | 'error' | 'debug'
+// Log seviyeleri (API dokümantasyonuna uygun)
+export type LogLevel = 'info' | 'warning' | 'error' | 'debug'
 
-/**
- * Uygulama modülleri
- */
+// Uygulama modülleri
 export type LogModule = 'auth' | 'rss' | 'news' | 'settings' | 'forum' | 'users' | 'reports' | 'notification'
 
-/**
- * Log metadata için genel tip
- */
+// Log metadata için genel tip
 export type LogMetadata = Record<string, string | number | boolean | null | undefined>
 
-/**
- * Log kaydı oluşturma için gerekli veriler
- */
+// Log kaydı oluşturma için gerekli veriler
 export interface CreateLogRequest {
   level: LogLevel
   message: string
@@ -28,17 +20,10 @@ export interface CreateLogRequest {
   metadata?: LogMetadata
 }
 
-/**
- * Merkezi log servisi
- * Tüm uygulama genelinde log kayıtları oluşturmak için kullanılır
- */
+// Merkezi log servisi
+// Tüm uygulama genelinde log kayıtları oluşturmak için kullanılır
 class LogService {
-  /**
-   * Bilgi seviyesinde log kaydı oluşturur
-   * @param module - Log kaydının ait olduğu modül
-   * @param message - Log mesajı
-   * @param metadata - Ek bilgiler (opsiyonel)
-   */
+  // Bilgi seviyesinde log kaydı oluşturur
   async info(module: LogModule, message: string, metadata?: LogMetadata) {
     return this.createLog({
       level: 'info',
@@ -48,27 +33,17 @@ class LogService {
     })
   }
 
-  /**
-   * Uyarı seviyesinde log kaydı oluşturur
-   * @param module - Log kaydının ait olduğu modül
-   * @param message - Log mesajı
-   * @param metadata - Ek bilgiler (opsiyonel)
-   */
-  async warn(module: LogModule, message: string, metadata?: LogMetadata) {
+  // Uyarı seviyesinde log kaydı oluşturur
+  async warning(module: LogModule, message: string, metadata?: LogMetadata) {
     return this.createLog({
-      level: 'warn',
+      level: 'warning',
       module,
       message,
       metadata,
     })
   }
 
-  /**
-   * Hata seviyesinde log kaydı oluşturur
-   * @param module - Log kaydının ait olduğu modül
-   * @param message - Log mesajı
-   * @param metadata - Ek bilgiler (opsiyonel)
-   */
+  // Hata seviyesinde log kaydı oluşturur
   async error(module: LogModule, message: string, metadata?: LogMetadata) {
     return this.createLog({
       level: 'error',
@@ -78,12 +53,7 @@ class LogService {
     })
   }
 
-  /**
-   * Debug seviyesinde log kaydı oluşturur
-   * @param module - Log kaydının ait olduğu modül
-   * @param message - Log mesajı
-   * @param metadata - Ek bilgiler (opsiyonel)
-   */
+  // Debug seviyesinde log kaydı oluşturur
   async debug(module: LogModule, message: string, metadata?: LogMetadata) {
     return this.createLog({
       level: 'debug',
@@ -93,11 +63,7 @@ class LogService {
     })
   }
 
-  /**
-   * Log kaydı oluşturur
-   * @param logData - Log verisi
-   * @private
-   */
+  // Log kaydı oluşturur
   private async createLog(logData: CreateLogRequest) {
     try {
       // Tarayıcı bilgilerini otomatik ekle
@@ -119,14 +85,7 @@ class LogService {
     }
   }
 
-  /**
-   * Kullanıcı bilgilerini log kaydına eklemek için yardımcı metod
-   * @param userId - Kullanıcı ID'si
-   * @param module - Log modülü
-   * @param message - Log mesajı
-   * @param level - Log seviyesi
-   * @param metadata - Ek bilgiler
-   */
+  // Kullanıcı bilgilerini log kaydına eklemek için yardımcı metod
   async logWithUser(
     userId: string,
     module: LogModule,
@@ -144,7 +103,5 @@ class LogService {
   }
 }
 
-/**
- * Singleton log service instance
- */
+// Singleton log service instance
 export const logService = new LogService() 

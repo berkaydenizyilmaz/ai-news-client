@@ -1,10 +1,8 @@
 import { redirect } from 'react-router-dom'
 import { useAuthStore } from '@/store/auth-store'
 
-/**
- * Auth durumunu kontrol eden loader fonksiyonu
- * Modern React Router v6.4+ pattern'i
- */
+// Auth durumunu kontrol eden loader fonksiyonu
+// Modern React Router v6.4+ pattern'i
 export const requireAuth = () => {
   const { isAuthenticated } = useAuthStore.getState()
   
@@ -15,9 +13,7 @@ export const requireAuth = () => {
   return null
 }
 
-/**
- * Admin yetkisi gerektiren loader fonksiyonu
- */
+// Admin yetkisi gerektiren loader fonksiyonu
 export const requireAdmin = () => {
   const { isAuthenticated, user } = useAuthStore.getState()
   
@@ -32,10 +28,8 @@ export const requireAdmin = () => {
   return null
 }
 
-/**
- * Giriş yapmış kullanıcıları ana sayfaya yönlendiren loader
- * Login/Register sayfaları için
- */
+// Giriş yapmış kullanıcıları ana sayfaya yönlendiren loader
+// Login/Register sayfaları için
 export const redirectIfAuthenticated = () => {
   const { isAuthenticated } = useAuthStore.getState()
   

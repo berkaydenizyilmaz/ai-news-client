@@ -3,9 +3,7 @@ import { apiClient } from '@/lib/api-client'
 import { logService } from '@/lib/log-service'
 import type { ApiResponse } from '@/lib/types'
 
-/**
- * Setting varlık arayüzü (API dokümantasyonuna uygun)
- */
+// Setting varlık arayüzü (API dokümantasyonuna uygun)
 export interface Setting {
   id: string
   key: string
@@ -18,9 +16,7 @@ export interface Setting {
   updated_at: string
 }
 
-/**
- * Setting oluşturma isteği
- */
+// Setting oluşturma isteği
 export interface CreateSettingRequest {
   key: string
   value: string
@@ -29,26 +25,20 @@ export interface CreateSettingRequest {
   category?: 'general' | 'rss' | 'ai' | 'auth' | 'news' | 'forum' | 'email' | 'security'
 }
 
-/**
- * Setting güncelleme isteği
- */
+// Setting güncelleme isteği
 export interface UpdateSettingRequest {
   value?: string
   description?: string
 }
 
-/**
- * Settings sorgu parametreleri
- */
+// Settings sorgu parametreleri
 export interface SettingsQuery {
   category?: string
   type?: string
   search?: string
 }
 
-/**
- * Toplu güncelleme isteği
- */
+// Toplu güncelleme isteği
 export interface BulkUpdateRequest {
   settings: Array<{
     key: string
@@ -56,46 +46,28 @@ export interface BulkUpdateRequest {
   }>
 }
 
-/**
- * Settings API fonksiyonları
- * Admin panelinde sistem ayarları yönetimi için kullanılır
- */
+// Settings API fonksiyonları
+// Admin panelinde sistem ayarları yönetimi için kullanılır
 const settingsApi = {
-  /**
-   * Tüm ayarları getirir (filtreleme ile)
-   * @param params - Sorgu parametreleri
-   * @returns Ayar listesi ile Promise
-   */
+  // Tüm ayarları getirir (filtreleme ile)
   getSettings: async (params?: SettingsQuery): Promise<ApiResponse<Setting[]>> => {
     const response = await apiClient.get('/settings', { params })
     return response.data
   },
 
-  /**
-   * Belirli bir ayarı key'e göre getirir
-   * @param key - Ayar anahtarı
-   * @returns Ayar verisi ile Promise
-   */
+  // Belirli bir ayarı key'e göre getirir
   getSettingByKey: async (key: string): Promise<ApiResponse<Setting>> => {
     const response = await apiClient.get(`/settings/${key}`)
     return response.data
   },
 
-  /**
-   * Kategoriye göre ayarları getirir
-   * @param category - Kategori adı
-   * @returns Kategori ayarları ile Promise
-   */
+  // Kategoriye göre ayarları getirir
   getSettingsByCategory: async (category: string): Promise<ApiResponse<Setting[]>> => {
     const response = await apiClient.get(`/settings/category/${category}`)
     return response.data
   },
 
-  /**
-   * Yeni ayar oluşturur
-   * @param data - Ayar oluşturma verisi
-   * @returns Oluşturulan ayar ile Promise
-   */
+  // Yeni ayar oluşturur
   createSetting: async (data: CreateSettingRequest): Promise<ApiResponse<Setting>> => {
     try {
       const response = await apiClient.post('/settings', data)
@@ -120,12 +92,7 @@ const settingsApi = {
     }
   },
 
-  /**
-   * Ayarı günceller
-   * @param key - Ayar anahtarı
-   * @param data - Güncelleme verisi
-   * @returns Güncellenmiş ayar ile Promise
-   */
+  // Ayarı günceller
   updateSetting: async (key: string, data: UpdateSettingRequest): Promise<ApiResponse<Setting>> => {
     try {
       const response = await apiClient.put(`/settings/${key}`, data)
@@ -149,11 +116,7 @@ const settingsApi = {
     }
   },
 
-  /**
-   * Ayarı siler
-   * @param key - Ayar anahtarı
-   * @returns Silme sonucu ile Promise
-   */
+  // Ayarı siler
   deleteSetting: async (key: string): Promise<ApiResponse<void>> => {
     try {
       const response = await apiClient.delete(`/settings/${key}`)
@@ -174,11 +137,7 @@ const settingsApi = {
     }
   },
 
-  /**
-   * Toplu güncelleme
-   * @param data - Toplu güncelleme verisi
-   * @returns Güncelleme sonucu ile Promise
-   */
+  // Toplu güncelleme
   bulkUpdateSettings: async (data: BulkUpdateRequest): Promise<ApiResponse<void>> => {
     try {
       const response = await apiClient.put('/settings/bulk', data)
@@ -216,11 +175,7 @@ export const settingsKeys = {
 
 // TanStack Query Hooks
 
-/**
- * Tüm ayarları getirmek için TanStack Query hook'u
- * @param params - Sorgu parametreleri
- * @returns Ayar listesi için query nesnesi
- */
+// Tüm ayarları getirmek için TanStack Query hook'u
 export const useSettings = (params?: SettingsQuery) => {
   return useQuery({
     queryKey: settingsKeys.list(params),
@@ -232,11 +187,7 @@ export const useSettings = (params?: SettingsQuery) => {
   })
 }
 
-/**
- * Belirli bir ayarı getirmek için TanStack Query hook'u
- * @param key - Ayar anahtarı
- * @returns Ayar verisi için query nesnesi
- */
+// Belirli bir ayarı getirmek için TanStack Query hook'u
 export const useSetting = (key: string) => {
   return useQuery({
     queryKey: settingsKeys.detail(key),
@@ -248,11 +199,7 @@ export const useSetting = (key: string) => {
   })
 }
 
-/**
- * Kategoriye göre ayarları getirmek için TanStack Query hook'u
- * @param category - Kategori adı
- * @returns Kategori ayarları için query nesnesi
- */
+// Kategoriye göre ayarları getirmek için TanStack Query hook'u
 export const useSettingsByCategory = (category: string) => {
   return useQuery({
     queryKey: settingsKeys.category(category),
@@ -264,10 +211,7 @@ export const useSettingsByCategory = (category: string) => {
   })
 }
 
-/**
- * Yeni ayar oluşturmak için TanStack Query mutation hook'u
- * @returns Ayar oluşturma işlemi için mutation nesnesi
- */
+// Yeni ayar oluşturmak için TanStack Query mutation hook'u
 export const useCreateSetting = () => {
   const queryClient = useQueryClient()
   
@@ -283,10 +227,7 @@ export const useCreateSetting = () => {
   })
 }
 
-/**
- * Ayar güncellemek için TanStack Query mutation hook'u
- * @returns Ayar güncelleme işlemi için mutation nesnesi
- */
+// Ayar güncellemek için TanStack Query mutation hook'u
 export const useUpdateSetting = () => {
   const queryClient = useQueryClient()
   
@@ -303,10 +244,7 @@ export const useUpdateSetting = () => {
   })
 }
 
-/**
- * Ayar silmek için TanStack Query mutation hook'u
- * @returns Ayar silme işlemi için mutation nesnesi
- */
+// Ayar silmek için TanStack Query mutation hook'u
 export const useDeleteSetting = () => {
   const queryClient = useQueryClient()
   
@@ -320,10 +258,7 @@ export const useDeleteSetting = () => {
   })
 }
 
-/**
- * Toplu güncelleme için TanStack Query mutation hook'u
- * @returns Toplu güncelleme işlemi için mutation nesnesi
- */
+// Toplu güncelleme için TanStack Query mutation hook'u
 export const useBulkUpdateSettings = () => {
   const queryClient = useQueryClient()
   

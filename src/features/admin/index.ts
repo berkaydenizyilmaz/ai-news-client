@@ -3,6 +3,10 @@ export { AdminSidebar } from './components/AdminSidebar'
 export { AdminLayout } from './components/AdminLayout'
 export { AdminHome } from './components/AdminHome'
 export { LogViewer } from './components/LogViewer'
+export { SettingsList } from './components/SettingsList'
+export { SettingsForm } from './components/SettingsForm'
+export { RssSourcesList } from './components/RssSourcesList'
+export { RssSourceForm } from './components/RssSourceForm'
 
 // API Services
 export { 
@@ -28,7 +32,17 @@ export {
   type BulkUpdateRequest
 } from './services/settings-api'
 
+export {
+  useRssSources,
+  useRssSource,
+  useCreateRssSource,
+  useUpdateRssSource,
+  useDeleteRssSource,
+  useFetchRssFeeds
+} from './services/rss-api'
+
 export { useSettingsManager } from './hooks/use-settings'
+export { useRssManager } from './hooks/use-rss'
 
 // Types
 export type { 
@@ -39,5 +53,12 @@ export type {
   LogStatsQuery, 
   ClearLogsRequest, 
   ClearLogsResponse,
-  PaginationInfo 
+  PaginationInfo,
+  RssSource,
+  CreateRssSourceRequest,
+  UpdateRssSourceRequest,
+  RssFetchRequest,
+  RssFetchResult,
+  RssSourceQuery,
+  RssSourcesResponse
 } from './types' 

@@ -7,12 +7,11 @@ import RegisterPage from '@/pages/auth/RegisterPage'
 import AdminHomePage from '@/pages/admin/AdminHomePage'
 import LogViewerPage from '@/pages/admin/LogViewerPage'
 import { RssPage } from '@/pages/admin/RssPage'
+import { SettingsPage } from '@/pages/admin/SettingsPage'
 import { requireAdmin, redirectIfAuthenticated } from './auth-loader'
 
-/**
- * React Router kullanarak uygulama yönlendirici yapılandırması
- * Tüm rotaları ve bunlara karşılık gelen bileşenleri tanımlar
- */
+// React Router kullanarak uygulama yönlendirici yapılandırması
+// Tüm rotaları ve bunlara karşılık gelen bileşenleri tanımlar
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -42,6 +41,11 @@ export const router = createBrowserRouter([
     path: 'admin/rss',
     loader: requireAdmin,
     element: <RssPage />,
+  },
+  {
+    path: 'admin/settings',
+    loader: requireAdmin,
+    element: <SettingsPage />,
   },
   {
     path: 'login',

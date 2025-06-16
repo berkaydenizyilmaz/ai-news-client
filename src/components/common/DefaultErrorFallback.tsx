@@ -2,22 +2,16 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { navigationService } from '@/lib/navigation-service'
 
-/**
- * Varsayılan hata fallback bileşeni props arayüzü
- */
+// Varsayılan hata fallback bileşeni props arayüzü
 interface DefaultErrorFallbackProps {
-  /** Oluşan hata (opsiyonel) */
+  // Oluşan hata (opsiyonel)
   error?: Error
-  /** Hatayı sıfırlamak için fonksiyon */
+  // Hatayı sıfırlamak için fonksiyon
   resetError: () => void
 }
 
-/**
- * Varsayılan hata fallback bileşeni
- * Error Boundary tarafından yakalanan hatalar için kullanıcı dostu bir arayüz sağlar
- * @param props - Bileşen props'ları
- * @returns Hata fallback UI için JSX elementi
- */
+// Varsayılan hata fallback bileşeni
+// Error Boundary tarafından yakalanan hatalar için kullanıcı dostu bir arayüz sağlar
 export function DefaultErrorFallback({ error, resetError }: DefaultErrorFallbackProps) {
   return (
     <div className="min-h-screen flex items-center justify-center p-4">

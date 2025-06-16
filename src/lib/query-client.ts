@@ -1,10 +1,8 @@
 import { QueryClient } from '@tanstack/react-query'
 import { errorService, ErrorType } from './error-service'
 
-/**
- * Optimize edilmiş varsayılanlarla yapılandırılmış TanStack Query istemcisi
- * Yeniden deneme mantığı, hata işleme ve önbellek yapılandırması içerir
- */
+// Optimize edilmiş varsayılanlarla yapılandırılmış TanStack Query istemcisi
+// Yeniden deneme mantığı, hata işleme ve önbellek yapılandırması içerir
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -16,7 +14,7 @@ export const queryClient = new QueryClient({
         
         // Auth ve client hatalarında retry yapma
         if (normalizedError.type === ErrorType.AUTH || normalizedError.statusCode === 404) {
-          return false
+            return false
         }
         
         return failureCount < 3

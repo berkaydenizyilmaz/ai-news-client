@@ -4,15 +4,9 @@ import { logService } from '@/lib/log-service'
 import type { ApiResponse } from '@/lib/types'
 import type { LoginRequest, RegisterRequest, AuthResponse, User } from '../types'
 
-/**
- * Kimlik doğrulama API fonksiyonları
- */
+// Kimlik doğrulama API fonksiyonları
 const authApi = {
-  /**
-   * Kullanıcıyı kimlik bilgileri ile doğrular
-   * @param data - Giriş isteği verisi
-   * @returns Kimlik doğrulama yanıtı ile Promise
-   */
+  // Kullanıcıyı kimlik bilgileri ile doğrular
   login: async (data: LoginRequest): Promise<ApiResponse<AuthResponse>> => {
     try {
       const response = await apiClient.post('/auth/login', data)
@@ -37,11 +31,7 @@ const authApi = {
     }
   },
 
-  /**
-   * Yeni bir kullanıcı hesabı kaydeder
-   * @param data - Kayıt isteği verisi
-   * @returns Kimlik doğrulama yanıtı ile Promise
-   */
+  // Yeni bir kullanıcı hesabı kaydeder
   register: async (data: RegisterRequest): Promise<ApiResponse<AuthResponse>> => {
     try {
       const response = await apiClient.post('/auth/register', data)
@@ -68,10 +58,7 @@ const authApi = {
     }
   },
 
-  /**
-   * Mevcut kullanıcı profilini getirir
-   * @returns Kullanıcı verisi ile Promise
-   */
+  // Mevcut kullanıcı profilini getirir
   getProfile: async (): Promise<ApiResponse<User>> => {
     const response = await apiClient.get('/auth/profile')
     return response.data
@@ -80,10 +67,7 @@ const authApi = {
 
 // TanStack Query Hooks
 
-/**
- * Kullanıcı girişi için TanStack Query mutation hook'u
- * @returns Giriş işlemi için mutation nesnesi
- */
+// Kullanıcı girişi için TanStack Query mutation hook'u
 export const useLogin = () => {
   return useMutation({
     mutationFn: authApi.login,
@@ -91,10 +75,7 @@ export const useLogin = () => {
   })
 }
 
-/**
- * Kullanıcı kaydı için TanStack Query mutation hook'u
- * @returns Kayıt işlemi için mutation nesnesi
- */
+// Kullanıcı kaydı için TanStack Query mutation hook'u
 export const useRegister = () => {
   return useMutation({
     mutationFn: authApi.register,
@@ -102,10 +83,7 @@ export const useRegister = () => {
   })
 }
 
-/**
- * Kullanıcı profili getirmek için TanStack Query hook'u
- * @returns Profil verisi için query nesnesi (varsayılan olarak devre dışı)
- */
+// Kullanıcı profili getirmek için TanStack Query hook'u
 export const useProfile = () => {
   return useQuery({
     queryKey: ['auth', 'profile'],
