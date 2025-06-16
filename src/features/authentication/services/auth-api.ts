@@ -2,7 +2,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/lib/api-client'
 import { logService } from '@/lib/log-service'
 import type { ApiResponse } from '@/lib/types'
-import type { LoginRequest, RegisterRequest, AuthResponse, User } from '../types'
+import type { LoginRequest, RegisterRequest, AuthResponse, User, UpdateProfileRequest, ChangePasswordRequest } from '../types'
 
 // Kimlik doğrulama API fonksiyonları
 const authApi = {
@@ -63,6 +63,51 @@ const authApi = {
     const response = await apiClient.get('/auth/profile')
     return response.data
   },
+
+  // Kullanıcı profilini günceller
+  updateProfile: async (data: UpdateProfileRequest): Promise<ApiResponse<User>> => {
+    try {
+      const response = await apiClient.put('/auth/profile', data)
+      
+      // Başarılı profil güncelleme logu
+      if (response.data.success) {
+        await logService.info('auth', 'Kullanıcı profili güncellendi', {
+          user_id: response.data.data?.id,
+          updated_fields: Object.keys(data).join(', ')
+        })
+      }
+      
+      return response.data
+    } catch (error) {
+      // Başarısız profil güncelleme logu
+      await logService.error('auth', 'Profil güncelleme başarısız', {
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+      })
+      throw error
+    }
+  },
+
+  // Kullanıcı şifresini değiştirir
+  changePassword: async (data: ChangePasswordRequest): Promise<ApiResponse<void>> => {
+    try {
+      const response = await apiClient.put('/auth/change-password', data)
+      
+      // Başarılı şifre değiştirme logu
+      if (response.data.success) {
+        await logService.info('auth', 'Kullanıcı şifresi değiştirildi', {
+          action: 'password_change'
+        })
+      }
+      
+      return response.data
+    } catch (error) {
+      // Başarısız şifre değiştirme logu
+      await logService.error('auth', 'Şifre değiştirme başarısız', {
+        error: error instanceof Error ? error.message : 'Bilinmeyen hata'
+      })
+      throw error
+    }
+  },
 }
 
 // TanStack Query Hooks
@@ -89,5 +134,21 @@ export const useProfile = () => {
     queryKey: ['auth', 'profile'],
     queryFn: authApi.getProfile,
     enabled: false, // Manuel olarak çağırılacak
+  })
+}
+
+// Kullanıcı profili güncellemek için TanStack Query mutation hook'u
+export const useUpdateProfile = () => {
+  return useMutation({
+    mutationFn: authApi.updateProfile,
+    mutationKey: ['auth', 'update-profile'],
+  })
+}
+
+// Kullanıcı şifresi değiştirmek için TanStack Query mutation hook'u
+export const useChangePassword = () => {
+  return useMutation({
+    mutationFn: authApi.changePassword,
+    mutationKey: ['auth', 'change-password'],
   })
 } 

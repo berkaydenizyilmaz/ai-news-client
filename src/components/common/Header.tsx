@@ -48,6 +48,9 @@ export function Header() {
                 <span className="text-sm text-muted-foreground">
                   Hoş geldin, {user?.username}
                 </span>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/profile">Profil</Link>
+                </Button>
                 <Button variant="outline" size="sm" onClick={logout}>
                   Çıkış
                 </Button>

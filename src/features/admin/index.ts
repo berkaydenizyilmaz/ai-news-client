@@ -13,7 +13,6 @@ export {
   useLogs, 
   useLog, 
   useLogStats, 
-  useDeleteLog, 
   useClearLogs 
 } from './services/log-api'
 

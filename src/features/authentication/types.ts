@@ -38,6 +38,24 @@ export interface RegisterRequest {
   username: string;
 }
 
+// Şifre değiştirme isteği yükü
+export interface ChangePasswordRequest {
+  // Mevcut şifre
+  currentPassword: string;
+  // Yeni şifre
+  newPassword: string;
+}
+
+// Profil güncelleme isteği yükü
+export interface UpdateProfileRequest {
+  // Opsiyonel e-posta adresi
+  email?: string;
+  // Opsiyonel kullanıcı adı
+  username?: string;
+  // Opsiyonel avatar URL'si
+  avatar_url?: string;
+}
+
 // Sunucudan gelen kimlik doğrulama yanıtı
 export interface AuthResponse {
   // Kimlik doğrulanmış kullanıcı verisi

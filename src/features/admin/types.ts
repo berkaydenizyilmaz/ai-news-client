@@ -59,7 +59,7 @@ export interface RssSourcesResponse {
   page: number;
   limit: number;
   totalPages: number;
-}
+} 
 
 // Log Feature Types
 export type LogLevel = 'info' | 'warning' | 'error' | 'debug'

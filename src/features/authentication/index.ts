@@ -4,12 +4,27 @@
 // Components
 export { LoginForm } from './components/LoginForm'
 export { RegisterForm } from './components/RegisterForm'
+export { ProfileForm } from './components/ProfileForm'
+export { ChangePasswordForm } from './components/ChangePasswordForm'
 
 // Hooks
 export { useAuth } from './hooks/use-auth'
 
 // Services
-export { useLogin, useRegister, useProfile } from './services/auth-api'
+export { 
+  useLogin, 
+  useRegister, 
+  useProfile, 
+  useUpdateProfile, 
+  useChangePassword 
+} from './services/auth-api'
 
 // Types
-export type { User, LoginRequest, RegisterRequest, AuthResponse } from './types'
+export type { 
+  User, 
+  LoginRequest, 
+  RegisterRequest, 
+  AuthResponse,
+  UpdateProfileRequest,
+  ChangePasswordRequest
+} from './types'
