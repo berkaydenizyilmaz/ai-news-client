@@ -14,7 +14,7 @@ export function RootLayout() {
       </main>
       <footer className="border-t py-6 w-full">
         <div className="container mx-auto px-4 text-center text-muted-foreground max-w-7xl">
-          <p>&copy; 2025 AI News Platform. Tüm hakları saklıdır.</p>
+          <p>&copy; {new Date().getFullYear()} AI News Platform. Tüm hakları saklıdır.</p>
         </div>
       </footer>
       <Toaster />

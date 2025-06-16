@@ -1,13 +1,12 @@
-import { type ReactNode } from 'react'
-import { AdminSidebar } from './AdminSidebar'
+import { Outlet } from 'react-router-dom'
+import { AdminSidebar } from '../features/admin/components/AdminSidebar'
 import { cn } from '@/lib/utils'
 
 interface AdminLayoutProps {
-  children: ReactNode
   className?: string
 }
 
-export function AdminLayout({ children, className }: AdminLayoutProps) {
+export function AdminLayout({ className }: AdminLayoutProps) {
   return (
     <div className="flex h-screen bg-background">
       <AdminSidebar />
@@ -17,7 +16,7 @@ export function AdminLayout({ children, className }: AdminLayoutProps) {
         className
       )}>
         <div className="container mx-auto p-6 lg:p-8">
-          {children}
+          <Outlet />
         </div>
       </main>
     </div>

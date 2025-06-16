@@ -11,7 +11,7 @@ import { RssPage } from '@/pages/admin/RssPage'
 import { SettingsPage } from '@/pages/admin/SettingsPage'
 import { UsersPage } from '@/pages/admin/UsersPage'
 import { requireAuth, requireAdmin, redirectIfAuthenticated } from './auth-loader'
-import { AdminLayoutWrapper } from './AdminLayoutWrapper'
+import { AdminLayout } from '@/router/AdminLayout'
 
 // React Router kullanarak uygulama yönlendirici yapılandırması
 // Tüm rotaları ve bunlara karşılık gelen bileşenleri tanımlar
@@ -38,7 +38,7 @@ export const router = createBrowserRouter([
   {
     path: 'admin',
     loader: requireAdmin,
-    element: <AdminLayoutWrapper />,
+    element: <AdminLayout />,
     children: [
       {
         index: true,

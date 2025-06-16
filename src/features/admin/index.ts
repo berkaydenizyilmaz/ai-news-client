@@ -1,6 +1,6 @@
 // Components
 export { AdminSidebar } from './components/AdminSidebar'
-export { AdminLayout } from './components/AdminLayout'
+export { AdminLayout } from '../../router/AdminLayout'
 export { AdminHome } from './components/AdminHome'
 export { LogViewer } from './components/LogViewer'
 export { SettingsList } from './components/SettingsList'
