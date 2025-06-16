@@ -13,7 +13,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { useRssSources } from '../services/rss-api';
-import { useRss } from '../hooks/use-rss';
+import { useRssManager } from '../hooks/use-rss';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import type { RssSourceQuery } from '../types';
 
@@ -31,7 +31,7 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
   const [search, setSearch] = useState('');
 
   const { data, isLoading, error } = useRssSources(query);
-  const { fetchRssFeeds, isAdmin } = useRss();
+  const { fetchRssFeeds, isAdmin } = useRssManager();
   const { handleError } = useErrorHandler();
 
   const handleSearch = () => {
@@ -234,22 +234,22 @@ export const RssSourcesList = ({ onCreateClick, onEditClick }: RssSourcesListPro
           </div>
 
           {/* Pagination */}
-          {data.pagination && data.pagination.total_pages > 1 && (
+          {data.totalPages > 1 && (
             <div className="flex justify-center gap-2">
               <Button
                 variant="outline"
                 onClick={() => handlePageChange(query.page! - 1)}
-                disabled={!data.pagination.has_prev}
+                disabled={query.page === 1}
               >
                 Önceki
               </Button>
               <span className="flex items-center px-4 text-sm text-muted-foreground">
-                Sayfa {data.pagination.current_page} / {data.pagination.total_pages}
+                Sayfa {data.page} / {data.totalPages}
               </span>
               <Button
                 variant="outline"
                 onClick={() => handlePageChange(query.page! + 1)}
-                disabled={!data.pagination.has_next}
+                disabled={query.page === data.totalPages}
               >
                 Sonraki
               </Button>

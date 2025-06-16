@@ -41,37 +41,106 @@ export interface AppError {
 }
 
 /**
+ * Backend API'den gelen hata mesajlarına göre mapping
+ * API dokümantasyonundaki hata formatlarına uygun
+ */
+const ERROR_MESSAGE_MAP: Record<string, { type: ErrorType; message: string; severity: ErrorSeverity }> = {
+  // Authentication errors (API'den gelen mesajlar)
+  'Token bulunamadı': {
+    type: ErrorType.AUTH,
+    message: 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın',
+    severity: ErrorSeverity.HIGH
+  },
+  'Geçersiz token': {
+    type: ErrorType.AUTH,
+    message: 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın',
+    severity: ErrorSeverity.HIGH
+  },
+  'Bu işlem için yetkiniz yok': {
+    type: ErrorType.AUTH,
+    message: 'Bu işlem için yetkiniz bulunmuyor',
+    severity: ErrorSeverity.HIGH
+  },
+  
+  // Validation errors
+  'Geçersiz veri formatı': {
+    type: ErrorType.VALIDATION,
+    message: 'Girilen bilgiler geçersiz',
+    severity: ErrorSeverity.LOW
+  },
+  
+  // Not found errors
+  'Kaynak bulunamadı': {
+    type: ErrorType.VALIDATION,
+    message: 'Aranan kaynak bulunamadı',
+    severity: ErrorSeverity.LOW
+  },
+  
+  // Server errors
+  'Sunucu hatası oluştu': {
+    type: ErrorType.SERVER,
+    message: 'Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin',
+    severity: ErrorSeverity.HIGH
+  }
+}
+
+/**
+ * HTTP status koduna göre varsayılan hata mapping'i
+ */
+const STATUS_CODE_MAP: Record<number, { type: ErrorType; message: string; severity: ErrorSeverity }> = {
+  400: {
+    type: ErrorType.VALIDATION,
+    message: 'Geçersiz istek',
+    severity: ErrorSeverity.LOW
+  },
+  401: {
+    type: ErrorType.VALIDATION,
+    message: 'E-posta adresi veya şifre hatalı',
+    severity: ErrorSeverity.LOW
+  },
+  403: {
+    type: ErrorType.AUTH,
+    message: 'Bu işlem için yetkiniz bulunmuyor',
+    severity: ErrorSeverity.HIGH
+  },
+  404: {
+    type: ErrorType.VALIDATION,
+    message: 'Aranan kaynak bulunamadı',
+    severity: ErrorSeverity.LOW
+  },
+  422: {
+    type: ErrorType.VALIDATION,
+    message: 'Girilen bilgiler geçersiz',
+    severity: ErrorSeverity.LOW
+  },
+  429: {
+    type: ErrorType.VALIDATION,
+    message: 'Çok fazla istek gönderildi. Lütfen bekleyin',
+    severity: ErrorSeverity.MEDIUM
+  },
+  500: {
+    type: ErrorType.SERVER,
+    message: 'Sunucu hatası oluştu',
+    severity: ErrorSeverity.CRITICAL
+  },
+  502: {
+    type: ErrorType.SERVER,
+    message: 'Sunucu geçici olarak kullanılamıyor',
+    severity: ErrorSeverity.HIGH
+  },
+  503: {
+    type: ErrorType.SERVER,
+    message: 'Servis geçici olarak kullanılamıyor',
+    severity: ErrorSeverity.HIGH
+  }
+}
+
+/**
  * Hata servis sınıfı
  * Merkezi hata yönetimi, sınıflandırma ve kullanıcı bildirimleri
  */
 class ErrorService {
-  /**
-   * HTTP status koduna göre hata türünü belirler
-   */
-  private getErrorTypeFromStatus(status: number): ErrorType {
-    if (status === 401 || status === 403) return ErrorType.AUTH
-    if (status >= 400 && status < 500) return ErrorType.VALIDATION
-    if (status >= 500) return ErrorType.SERVER
-    return ErrorType.UNKNOWN
-  }
 
-  /**
-   * Hata şiddetini belirler
-   */
-  private getErrorSeverity(type: ErrorType, status?: number): ErrorSeverity {
-    switch (type) {
-      case ErrorType.AUTH:
-        return ErrorSeverity.HIGH
-      case ErrorType.SERVER:
-        return status === 500 ? ErrorSeverity.CRITICAL : ErrorSeverity.HIGH
-      case ErrorType.NETWORK:
-        return ErrorSeverity.MEDIUM
-      case ErrorType.VALIDATION:
-        return ErrorSeverity.LOW
-      default:
-        return ErrorSeverity.MEDIUM
-    }
-  }
 
   /**
    * Ham hatayı AppError formatına dönüştürür
@@ -85,15 +154,52 @@ class ErrorService {
     // Axios/API hatası
     if (this.isApiError(error)) {
       const status = error.response?.status || 0
-      const type = this.getErrorTypeFromStatus(status)
-      const severity = this.getErrorSeverity(type, status)
+      const responseData = error.response?.data
       
+      // 1. Öncelik: Backend mesaj mapping
+      const backendMessage = responseData?.error || responseData?.message
+      if (backendMessage && ERROR_MESSAGE_MAP[backendMessage]) {
+        const mapping = ERROR_MESSAGE_MAP[backendMessage]
+        return {
+          type: mapping.type,
+          severity: mapping.severity,
+          message: mapping.message,
+          statusCode: status,
+          details: backendMessage,
+          originalError: error
+        }
+      }
+      
+      // 2. İkinci öncelik: Status code mapping
+      if (STATUS_CODE_MAP[status]) {
+        const mapping = STATUS_CODE_MAP[status]
+        return {
+          type: mapping.type,
+          severity: mapping.severity,
+          message: mapping.message,
+          statusCode: status,
+          details: responseData?.error || responseData?.message,
+          originalError: error
+        }
+      }
+      
+      // 3. Son çare: Genel hata
       return {
-        type,
-        severity,
-        message: error.message || 'Bir hata oluştu',
+        type: ErrorType.UNKNOWN,
+        severity: ErrorSeverity.MEDIUM,
+        message: responseData?.error || responseData?.message || error.message || 'Bir hata oluştu',
         statusCode: status,
-        details: error.response?.data?.message,
+        details: responseData?.error || responseData?.message,
+        originalError: error
+      }
+    }
+
+    // Network hatası (bağlantı yok, timeout vb.)
+    if (error instanceof Error && error.message.includes('Network Error')) {
+      return {
+        type: ErrorType.NETWORK,
+        severity: ErrorSeverity.MEDIUM,
+        message: 'İnternet bağlantınızı kontrol edin',
         originalError: error
       }
     }
@@ -133,11 +239,23 @@ class ErrorService {
   /**
    * Hatanın API hatası olup olmadığını kontrol eder
    */
-  private isApiError(error: unknown): error is Error & { response?: { status: number; data?: any } } {
+  private isApiError(error: unknown): error is Error & { 
+    response?: { 
+      status: number; 
+      data?: { 
+        message?: string;
+        error?: string;
+        errors?: Array<{
+          field: string;
+          message: string;
+        }>;
+      } 
+    } 
+  } {
     return (
       error instanceof Error &&
       'response' in error &&
-      typeof (error as any).response === 'object'
+      typeof (error as Error & { response?: unknown }).response === 'object'
     )
   }
 
@@ -172,20 +290,11 @@ class ErrorService {
 
   /**
    * Hata için kullanıcı dostu mesaj üretir
+   * Mapping sisteminde mesaj zaten normalize edilmiş olur
    */
   getUserMessage(error: AppError): string {
-    switch (error.type) {
-      case ErrorType.NETWORK:
-        return 'İnternet bağlantınızı kontrol edin ve tekrar deneyin'
-      case ErrorType.AUTH:
-        return 'Oturum süreniz dolmuş. Lütfen tekrar giriş yapın'
-      case ErrorType.SERVER:
-        return 'Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin'
-      case ErrorType.VALIDATION:
-        return error.message
-      default:
-        return error.message || 'Bir hata oluştu'
-    }
+    // Mapping sisteminden gelen mesajlar zaten kullanıcı dostu
+    return error.message || 'Bir hata oluştu'
   }
 
   /**

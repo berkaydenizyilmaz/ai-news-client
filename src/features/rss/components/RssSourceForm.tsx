@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Save, X } from 'lucide-react';
 import { useRssSource } from '../services/rss-api';
-import { useRss } from '../hooks/use-rss';
+import { useRssManager } from '../hooks/use-rss';
 import { useErrorHandler } from '@/hooks/use-error-handler';
 import type { CreateRssSourceRequest, UpdateRssSourceRequest } from '../types';
 
@@ -36,7 +36,7 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
 
   const isEditing = !!sourceId;
   const { data: existingSource, isLoading: isLoadingSource } = useRssSource(sourceId || '');
-  const { createRssSource, updateRssSource } = useRss();
+  const { createRssSource, updateRssSource } = useRssManager();
   const { handleError } = useErrorHandler();
 
   const {

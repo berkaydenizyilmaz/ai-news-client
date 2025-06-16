@@ -55,12 +55,8 @@ export interface RssSourceQuery {
 
 export interface RssSourcesResponse {
   sources: RssSource[];
-  pagination?: {
-    current_page: number;
-    total_pages: number;
-    total_items: number;
-    items_per_page: number;
-    has_next: boolean;
-    has_prev: boolean;
-  };
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
 } 

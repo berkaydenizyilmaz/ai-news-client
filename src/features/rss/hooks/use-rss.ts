@@ -9,7 +9,11 @@ import {
 } from '../services/rss-api';
 import type { CreateRssSourceRequest, UpdateRssSourceRequest, RssFetchRequest } from '../types';
 
-export const useRss = () => {
+/**
+ * RSS yönetimi için merkezi hook
+ * Admin yetki kontrolü ve helper fonksiyonlar sağlar
+ */
+export const useRssManager = () => {
   const { user } = useAuthStore();
   const isAdmin = user?.role === 'admin';
 

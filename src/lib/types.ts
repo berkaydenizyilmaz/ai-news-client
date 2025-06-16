@@ -24,20 +24,21 @@ export interface ApiResponse<T> {
 
 /**
  * Sayfalanmış API yanıtları için sayfalama bilgileri
+ * API dokümantasyonuna uygun format
  */
 export interface PaginationInfo {
   /** Mevcut sayfa numarası */
-  current_page: number;
-  /** Toplam sayfa sayısı */
-  total_pages: number;
-  /** Tüm sayfalardaki toplam öğe sayısı */
-  total_items: number;
+  page: number;
   /** Sayfa başına öğe sayısı */
-  items_per_page: number;
+  limit: number;
+  /** Tüm sayfalardaki toplam öğe sayısı */
+  total: number;
+  /** Toplam sayfa sayısı */
+  totalPages: number;
   /** Sonraki sayfa olup olmadığı */
-  has_next: boolean;
+  hasNext: boolean;
   /** Önceki sayfa olup olmadığı */
-  has_prev: boolean;
+  hasPrev: boolean;
 }
 
 // ==================== ERROR TYPES ====================

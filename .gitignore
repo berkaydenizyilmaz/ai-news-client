@@ -29,6 +29,6 @@ dist-ssr
 .env.test.local
 .env.production.local
 
-API_DOCUMENTATION.md
+.cursor/
 
-.cursor/*
+api-docs/
