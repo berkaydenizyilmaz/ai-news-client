@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useUpdateProfile } from '../services/auth-api'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import { useAuthStore } from '@/store/auth-store'
+import { useToast } from '@/hooks/use-toast'
 import type { User, UpdateProfileRequest } from '../types'
 import { User as UserIcon, Mail, AtSign, Image } from 'lucide-react'
 
@@ -32,6 +33,7 @@ export function ProfileForm({ user, onSuccess }: ProfileFormProps) {
   const updateProfileMutation = useUpdateProfile()
   const { handleError } = useErrorHandler()
   const { updateUser } = useAuthStore()
+  const toast = useToast()
 
   const {
     register,
@@ -86,6 +88,9 @@ export function ProfileForm({ user, onSuccess }: ProfileFormProps) {
       if (response.data) {
         updateUser(response.data)
       }
+      
+      // Başarı mesajı
+      toast.success('Profil başarıyla güncellendi', 'Bilgileriniz kaydedildi.')
       
       setIsEditing(false)
       onSuccess?.()

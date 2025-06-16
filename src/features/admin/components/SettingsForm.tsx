@@ -21,6 +21,7 @@ import {
 import { ArrowLeft, Save, Settings as SettingsIcon } from 'lucide-react';
 import { useSetting, useCreateSetting, useUpdateSetting } from '../services/settings-api';
 import { useErrorHandler } from '@/hooks/use-error-handler';
+import { useToast } from '@/hooks/use-toast';
 
 // Form validation schema
 const settingsFormSchema = z.object({
@@ -53,6 +54,7 @@ export const SettingsForm = ({ settingKey, onSuccess, onCancel }: SettingsFormPr
   const createSetting = useCreateSetting();
   const updateSetting = useUpdateSetting();
   const { handleError } = useErrorHandler();
+  const toast = useToast();
 
   const form = useForm<SettingsFormData>({
     resolver: zodResolver(settingsFormSchema),
@@ -121,8 +123,10 @@ export const SettingsForm = ({ settingKey, onSuccess, onCancel }: SettingsFormPr
             description: data.description || undefined,
           }
         });
+        toast.success('Ayar güncellendi', `${data.key} başarıyla güncellendi.`);
       } else {
         await createSetting.mutateAsync(settingData);
+        toast.success('Ayar oluşturuldu', `${data.key} başarıyla eklendi.`);
       }
 
       onSuccess?.();

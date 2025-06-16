@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useChangePassword } from '../services/auth-api'
 import { useErrorHandler } from '@/hooks/use-error-handler'
+import { useToast } from '@/hooks/use-toast'
 import type { ChangePasswordRequest } from '../types'
 import { Lock, Eye, EyeOff } from 'lucide-react'
 
@@ -34,6 +35,7 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
   
   const changePasswordMutation = useChangePassword()
   const { handleError } = useErrorHandler()
+  const toast = useToast()
 
   const {
     register,
@@ -52,6 +54,10 @@ export function ChangePasswordForm({ onSuccess }: ChangePasswordFormProps) {
       }
 
       await changePasswordMutation.mutateAsync(requestData)
+      
+      // Başarı mesajı
+      toast.success('Şifre başarıyla değiştirildi', 'Yeni şifreniz aktif edildi.')
+      
       reset()
       onSuccess?.()
     } catch (error) {

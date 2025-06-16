@@ -13,6 +13,7 @@ import { Loader2, Save, X } from 'lucide-react';
 import { useRssSource } from '../services/rss-api';
 import { useRssManager } from '../hooks/use-rss';
 import { useErrorHandler } from '@/hooks/use-error-handler';
+import { useToast } from '@/hooks/use-toast';
 import type { CreateRssSourceRequest, UpdateRssSourceRequest } from '../types';
 
 const rssSourceSchema = z.object({
@@ -38,6 +39,7 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
   const { data: existingSource, isLoading: isLoadingSource } = useRssSource(sourceId || '');
   const { createRssSource, updateRssSource } = useRssManager();
   const { handleError } = useErrorHandler();
+  const toast = useToast();
 
   const {
     register,
@@ -83,6 +85,7 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
           is_active: data.is_active,
         };
         await updateRssSource.mutateAsync(sourceId, updateData);
+        toast.success('RSS kaynağı güncellendi', `${data.name} başarıyla güncellendi.`);
       } else {
         const createData: CreateRssSourceRequest = {
           name: data.name,
@@ -90,6 +93,7 @@ export const RssSourceForm = ({ sourceId, onSuccess, onCancel }: RssSourceFormPr
           description: data.description || undefined,
         };
         await createRssSource.mutateAsync(createData);
+        toast.success('RSS kaynağı oluşturuldu', `${data.name} başarıyla eklendi.`);
       }
       
       onSuccess?.();

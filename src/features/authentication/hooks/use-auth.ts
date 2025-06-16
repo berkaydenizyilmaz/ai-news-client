@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useAuthStore } from '@/store/auth-store'
 import { useLogin, useRegister } from '../services/auth-api'
 import { useErrorHandler } from '@/hooks/use-error-handler'
+import { useToast } from '@/hooks/use-toast'
 import type { LoginRequest, RegisterRequest } from '../types'
 
 // Kimlik doğrulama işlemleri için özel hook
@@ -10,6 +11,7 @@ export const useAuth = () => {
   const queryClient = useQueryClient()
   const { user, isAuthenticated, setAuth, clearAuth, setLoading } = useAuthStore()
   const { handleError } = useErrorHandler()
+  const toast = useToast()
   
   const loginMutation = useLogin()
   const registerMutation = useRegister()
@@ -21,6 +23,7 @@ export const useAuth = () => {
       const response = await loginMutation.mutateAsync(data)
       if (response.success && response.data) {
         setAuth(response.data.user, response.data.token)
+        toast.success('Giriş başarılı', `Hoş geldiniz, ${response.data.user.username}!`)
         return { success: true, message: response.message }
       }
       return { success: false, error: response.error || 'Giriş başarısız' }
@@ -41,6 +44,7 @@ export const useAuth = () => {
       const response = await registerMutation.mutateAsync(data)
       if (response.success && response.data) {
         setAuth(response.data.user, response.data.token)
+        toast.success('Kayıt başarılı', `Hesabınız oluşturuldu, ${response.data.user.username}!`)
         return { success: true, message: response.message }
       }
       return { success: false, error: response.error || 'Kayıt başarısız' }
@@ -57,6 +61,7 @@ export const useAuth = () => {
   // Mevcut kullanıcıyı çıkış yapar
   // Modern loader pattern sayesinde otomatik yönlendirme yapılır
   const logout = () => {
+    toast.info('Çıkış yapıldı', 'Güvenli bir şekilde çıkış yaptınız.')
     clearAuth()
     // TanStack Query cache'ini temizle
     queryClient.clear()

@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom'
 import { Header } from '@/components/common/Header'
+import { Toaster } from '@/components/ui/sonner'
 
 // Kök layout bileşeni
 // Uygulamanın ana layout yapısını sağlar (header, main, footer)
@@ -16,6 +17,7 @@ export function RootLayout() {
           <p>&copy; 2025 AI News Platform. Tüm hakları saklıdır.</p>
         </div>
       </footer>
+      <Toaster />
     </div>
   )
 } 
