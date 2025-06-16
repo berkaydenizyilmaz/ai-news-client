@@ -32,12 +32,6 @@ const logApi = {
     return response.data
   },
 
-  // Log kaydını siler
-  deleteLog: async (id: string): Promise<ApiResponse<void>> => {
-    const response = await apiClient.delete(`/logs/${id}`)
-    return response.data
-  },
-
   // Eski logları temizler
   clearLogs: async (data: ClearLogsRequest): Promise<ApiResponse<ClearLogsResponse>> => {
     const response = await apiClient.delete('/logs/clear', { data })
@@ -71,20 +65,6 @@ export const useLogStats = (params?: LogStatsQuery) => {
     queryKey: ['admin', 'logs', 'stats', params],
     queryFn: () => logApi.getLogStats(params),
     staleTime: 60000, // 1 dakika
-  })
-}
-
-// Log silmek için TanStack Query mutation hook'u
-export const useDeleteLog = () => {
-  const queryClient = useQueryClient()
-  
-  return useMutation({
-    mutationFn: logApi.deleteLog,
-    onSuccess: () => {
-      // Log listesini yenile
-      queryClient.invalidateQueries({ queryKey: ['admin', 'logs', 'list'] })
-      queryClient.invalidateQueries({ queryKey: ['admin', 'logs', 'stats'] })
-    },
   })
 }
 

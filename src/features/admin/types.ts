@@ -62,16 +62,19 @@ export interface RssSourcesResponse {
 }
 
 // Log Feature Types
+export type LogLevel = 'info' | 'warning' | 'error' | 'debug'
+export type LogModule = 'auth' | 'rss' | 'news' | 'settings' | 'forum' | 'users' | 'reports' | 'notification'
+
 export interface Log {
   id: string;
   level: 'info' | 'warning' | 'error' | 'debug';
   module: 'auth' | 'rss' | 'news' | 'settings' | 'forum' | 'users' | 'reports' | 'notification';
   message: string;
-  details?: Record<string, unknown>;
+  action?: string;
+  metadata?: Record<string, unknown>;
   user_id?: string;
-  ip_address?: string;
-  user_agent?: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface LogsResponse {

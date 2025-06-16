@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { useLogs, useDeleteLog } from '../services/log-api'
+import { useLogs } from '../services/log-api'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import type { LogQuery, LogLevel, LogModule } from '../types'
-import { Trash2, Search, AlertTriangle, Info, Bug, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Search, AlertTriangle, Info, Bug, ChevronLeft, ChevronRight } from 'lucide-react'
 
 // Log seviyesi için renk ve ikon eşleştirmesi
 const logLevelConfig = {
@@ -38,7 +38,6 @@ export function LogViewer () {
   })
 
   const { data: logsData, isLoading, error } = useLogs(filters)
-  const deleteLogMutation = useDeleteLog()
   const { handleError } = useErrorHandler()
 
   const logs = logsData?.data?.logs || []
@@ -53,14 +52,7 @@ export function LogViewer () {
       page: key !== 'page' ? 1 : (typeof value === 'number' ? value : 1),
     }))
   }
-
-  // Log silme işlemi
-  const handleDeleteLog = async (logId: string) => {
-    if (confirm('Bu log kaydını silmek istediğinizden emin misiniz?')) {
-      await deleteLogMutation.mutateAsync(logId)
-    }
-  }
-
+    
   // Kompakt tarih formatı
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
@@ -96,7 +88,7 @@ export function LogViewer () {
         <div>
           <h1 className="text-2xl font-bold">Sistem Logları</h1>
           <p className="text-sm text-muted-foreground">
-            {pagination?.total_items || 0} kayıt
+            {pagination?.total || 0} kayıt
           </p>
         </div>
       </div>
@@ -203,12 +195,17 @@ export function LogViewer () {
                           <Badge variant="outline" className="text-xs px-1.5 py-0">
                             {moduleLabels[log.module]}
                           </Badge>
+                          {log.action && (
+                            <Badge variant="secondary" className="text-xs px-1.5 py-0">
+                              {log.action}
+                            </Badge>
+                          )}
                           <span className="text-xs text-muted-foreground">
                             {formatDate(log.created_at)}
                           </span>
                           {log.user_id && (
                             <span className="text-xs text-muted-foreground">
-                              User: {log.user_id}
+                              User: {log.user_id.slice(0, 8)}...
                             </span>
                           )}
                         </div>
@@ -218,22 +215,16 @@ export function LogViewer () {
                         </p>
                         
                          {log.metadata && Object.keys(log.metadata).length > 0 && (
-                           <p className="text-xs text-muted-foreground line-clamp-1">
-                             {JSON.stringify(log.metadata)}
-                           </p>
+                           <div className="text-xs text-muted-foreground mt-1">
+                             <span className="font-medium">Metadata: </span>
+                             <span className="font-mono bg-muted px-1 rounded">
+                               {JSON.stringify(log.metadata, null, 0)}
+                             </span>
+                           </div>
                          )}
                       </div>
 
-                      {/* Silme Butonu */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0 shrink-0"
-                        onClick={() => handleDeleteLog(log.id)}
-                        disabled={deleteLogMutation.isPending}
-                      >
-                        <Trash2 className="h-3 w-3" />
-                      </Button>
+
                     </div>
                   </div>
                 )
@@ -244,25 +235,25 @@ export function LogViewer () {
       </Card>
 
       {/* Kompakt Pagination */}
-      {pagination && pagination.total_pages > 1 && (
+      {pagination && pagination.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Sayfa {pagination.current_page} / {pagination.total_pages}
+            Sayfa {pagination.page} / {pagination.totalPages}
           </p>
           <div className="flex gap-1">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => updateFilter('page', pagination.current_page - 1)}
-              disabled={pagination.current_page <= 1}
+              onClick={() => updateFilter('page', pagination.page - 1)}
+              disabled={pagination.page <= 1}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => updateFilter('page', pagination.current_page + 1)}
-              disabled={pagination.current_page >= pagination.total_pages}
+              onClick={() => updateFilter('page', pagination.page + 1)}
+              disabled={pagination.page >= pagination.totalPages}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
