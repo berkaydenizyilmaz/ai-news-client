@@ -67,7 +67,7 @@ export const SettingsForm = ({ settingKey, onSuccess, onCancel }: SettingsFormPr
 
   // Load existing setting data
   useEffect(() => {
-    if (existingSetting) {
+    if (isEditing && existingSetting) {
       form.reset({
         key: existingSetting.key,
         value: existingSetting.value,
@@ -76,7 +76,7 @@ export const SettingsForm = ({ settingKey, onSuccess, onCancel }: SettingsFormPr
         description: existingSetting.description || '',
       });
     }
-  }, [existingSetting, form]);
+  }, [existingSetting, form, isEditing]);
 
   const onSubmit = async (data: SettingsFormData) => {
     try {
@@ -247,7 +247,12 @@ export const SettingsForm = ({ settingKey, onSuccess, onCancel }: SettingsFormPr
                  render={({ field }) => (
                    <FormItem>
                      <FormLabel>Tip *</FormLabel>
-                     <Select onValueChange={field.onChange} value={field.value} disabled={isEditing}>
+                     <Select 
+                       onValueChange={field.onChange} 
+                       disabled={isEditing}
+                       defaultValue={field.value}
+                       key={`type-${field.value}-${isEditing}`}
+                     >
                        <FormControl>
                          <SelectTrigger>
                            <SelectValue placeholder="Veri tipini seçin" />
@@ -315,7 +320,12 @@ export const SettingsForm = ({ settingKey, onSuccess, onCancel }: SettingsFormPr
                  render={({ field }) => (
                    <FormItem>
                      <FormLabel>Kategori</FormLabel>
-                     <Select onValueChange={field.onChange} value={field.value} disabled={isEditing}>
+                     <Select 
+                       onValueChange={field.onChange} 
+                       disabled={isEditing}
+                       defaultValue={field.value}
+                       key={`category-${field.value}-${isEditing}`}
+                     >
                        <FormControl>
                          <SelectTrigger>
                            <SelectValue placeholder="Kategori seçin (opsiyonel)" />

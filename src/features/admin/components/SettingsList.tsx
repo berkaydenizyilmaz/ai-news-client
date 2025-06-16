@@ -193,90 +193,105 @@ export const SettingsList = ({ onCreateClick, onEditClick }: SettingsListProps) 
 
       {/* Loading State */}
       {isLoading && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-full" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-4 w-1/2 mb-2" />
-                <Skeleton className="h-4 w-2/3" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <Card>
+          <CardContent className="p-0">
+            <div className="divide-y">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-5 w-5" />
+                        <Skeleton className="h-6 w-48" />
+                        <Skeleton className="h-6 w-16" />
+                        <Skeleton className="h-6 w-20" />
+                      </div>
+                      <Skeleton className="h-4 w-full" />
+                      <div className="space-y-2">
+                        <Skeleton className="h-4 w-16" />
+                        <Skeleton className="h-20 w-full" />
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Skeleton className="h-9 w-20" />
+                      <Skeleton className="h-9 w-16" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
-      {/* Settings Grid */}
+      {/* Settings List */}
       {settings && settings.length > 0 && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {settings.map((setting) => (
-            <Card key={setting.key} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <SettingsIcon className="h-4 w-4" />
-                      {setting.key}
-                    </CardTitle>
-                    {setting.description && (
-                      <CardDescription className="mt-1">
-                        {setting.description}
-                      </CardDescription>
-                    )}
+        <Card>
+          <CardContent className="p-0">
+            <div className="divide-y">
+              {settings.map((setting) => (
+                <div key={setting.key} className="p-6 hover:bg-muted/50 transition-colors">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-3 mb-2">
+                        <SettingsIcon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                        <h3 className="font-semibold text-lg truncate">{setting.key}</h3>
+                        <div className="flex gap-2 flex-shrink-0">
+                          <Badge className={getTypeColor(setting.type)}>
+                            {setting.type}
+                          </Badge>
+                          {setting.category && (
+                            <Badge variant="outline" className={getCategoryColor(setting.category)}>
+                              {setting.category}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {setting.description && (
+                        <p className="text-muted-foreground text-sm mb-3">
+                          {setting.description}
+                        </p>
+                      )}
+                      
+                      <div className="space-y-2">
+                        <div className="text-sm font-medium">Değer:</div>
+                        <div className="text-sm bg-muted p-3 rounded border max-h-32 overflow-auto">
+                          <pre className="whitespace-pre-wrap break-words">
+                            {formatValue(setting.value, setting.type)}
+                          </pre>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2 flex-shrink-0">
+                      {onEditClick && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => onEditClick(setting.key)}
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Düzenle
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDeleteSetting(setting.key)}
+                        disabled={deleteSetting.isPending}
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Sil
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </CardHeader>
-              
-              <CardContent className="space-y-3">
-                <div className="flex gap-2">
-                  <Badge className={getTypeColor(setting.type)}>
-                    {setting.type}
-                  </Badge>
-                  {setting.category && (
-                    <Badge variant="outline" className={getCategoryColor(setting.category)}>
-                      {setting.category}
-                    </Badge>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">Değer:</div>
-                  <div className="text-sm bg-muted p-2 rounded border max-h-32 overflow-auto">
-                    <pre className="whitespace-pre-wrap break-words">
-                      {formatValue(setting.value, setting.type)}
-                    </pre>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  {onEditClick && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => onEditClick(setting.key)}
-                    >
-                      <Edit className="h-3 w-3 mr-1" />
-                      Düzenle
-                    </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDeleteSetting(setting.key)}
-                    disabled={deleteSetting.isPending}
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-3 w-3 mr-1" />
-                    Sil
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Empty State */}
