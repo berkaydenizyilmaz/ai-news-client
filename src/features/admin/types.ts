@@ -138,4 +138,61 @@ export interface PaginationInfo {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+// Users Feature Types
+export interface UserWithStats {
+  id: string;
+  email: string;
+  username: string;
+  role: 'visitor' | 'user' | 'moderator' | 'admin';
+  avatar_url?: string;
+  is_active: boolean;
+  comment_count: number;
+  forum_post_count: number;
+  unread_notifications: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GetUsersQuery {
+  limit?: number;
+  offset?: number;
+  search?: string;
+  role?: 'visitor' | 'user' | 'moderator' | 'admin';
+  is_active?: boolean;
+  sort?: 'created_at' | 'updated_at' | 'email' | 'username' | 'role';
+  sort_direction?: 'asc' | 'desc';
+}
+
+export interface UpdateUserRequest {
+  email?: string;
+  username?: string;
+  avatar_url?: string;
+  role?: 'visitor' | 'user' | 'moderator' | 'admin';
+  is_active?: boolean;
+}
+
+export interface UpdateUserRoleRequest {
+  role: 'visitor' | 'user' | 'moderator' | 'admin';
+}
+
+export interface UpdateUserStatusRequest {
+  is_active: boolean;
+}
+
+export interface UsersListResponse {
+  users: UserWithStats[];
+  pagination: {
+    total: number;
+    limit: number;
+    offset: number;
+    has_more: boolean;
+  };
+}
+
+export interface UsersStatistics {
+  total: number;
+  active: number;
+  inactive: number;
 } 

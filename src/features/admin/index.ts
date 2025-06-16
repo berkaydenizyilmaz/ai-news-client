@@ -7,6 +7,7 @@ export { SettingsList } from './components/SettingsList'
 export { SettingsForm } from './components/SettingsForm'
 export { RssSourcesList } from './components/RssSourcesList'
 export { RssSourceForm } from './components/RssSourceForm'
+export { UsersList } from './components/UsersList'
 
 // API Services
 export { 
@@ -40,8 +41,19 @@ export {
   useFetchRssFeeds
 } from './services/rss-api'
 
+export {
+  useUsers,
+  useUsersStatistics,
+  useUser,
+  useUpdateUser,
+  useUpdateUserRole,
+  useUpdateUserStatus,
+  useDeleteUser
+} from './services/users-api'
+
 export { useSettingsManager } from './hooks/use-settings'
 export { useRssManager } from './hooks/use-rss'
+export { useUsersManager } from './hooks/use-users'
 
 // Types
 export type { 
@@ -59,5 +71,12 @@ export type {
   RssFetchRequest,
   RssFetchResult,
   RssSourceQuery,
-  RssSourcesResponse
+  RssSourcesResponse,
+  UserWithStats,
+  GetUsersQuery,
+  UpdateUserRequest,
+  UpdateUserRoleRequest,
+  UpdateUserStatusRequest,
+  UsersListResponse,
+  UsersStatistics
 } from './types' 

@@ -9,6 +9,7 @@ import AdminHomePage from '@/pages/admin/AdminHomePage'
 import LogViewerPage from '@/pages/admin/LogViewerPage'
 import { RssPage } from '@/pages/admin/RssPage'
 import { SettingsPage } from '@/pages/admin/SettingsPage'
+import { UsersPage } from '@/pages/admin/UsersPage'
 import { requireAuth, requireAdmin, redirectIfAuthenticated } from './auth-loader'
 
 // React Router kullanarak uygulama yönlendirici yapılandırması
@@ -52,6 +53,11 @@ export const router = createBrowserRouter([
     path: 'admin/settings',
     loader: requireAdmin,
     element: <SettingsPage />,
+  },
+  {
+    path: 'admin/users',
+    loader: requireAdmin,
+    element: <UsersPage />,
   },
   {
     path: 'login',
