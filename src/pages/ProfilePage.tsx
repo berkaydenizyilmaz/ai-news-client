@@ -19,8 +19,8 @@ export function ProfilePage() {
   }, [user, refetch])
 
   const handleProfileUpdateSuccess = () => {
-    // Profil güncellendiğinde verileri yenile
-    refetch()
+    // Profil güncellendiğinde verileri yenile (opsiyonel, auth store zaten güncel)
+    // refetch()
   }
 
   const handlePasswordChangeSuccess = () => {
@@ -52,8 +52,8 @@ export function ProfilePage() {
     )
   }
 
-  // Profil verisi varsa onu kullan, yoksa store'daki user'ı kullan
-  const currentUser = profileData?.data || user
+  // Store'daki güncel user bilgisini kullan (profil güncellemelerinde otomatik güncellenir)
+  const currentUser = user || profileData?.data
 
   if (!currentUser) {
     return (

@@ -23,6 +23,11 @@ export const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
+        path: 'profile',
+        loader: requireAuth,
+        element: <ProfilePage />,
+      },
+      {
         path: '*',
         element: <NotFoundPage />,
       },
@@ -57,10 +62,5 @@ export const router = createBrowserRouter([
     path: 'register',
     loader: redirectIfAuthenticated,
     element: <RegisterPage />,
-  },
-  {
-    path: 'profile',
-    loader: requireAuth,
-    element: <ProfilePage />,
   },
 ]) 

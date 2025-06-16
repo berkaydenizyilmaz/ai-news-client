@@ -45,9 +45,6 @@ export function Header() {
             <ThemeToggle />
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                <span className="text-sm text-muted-foreground">
-                  Hoş geldin, {user?.username}
-                </span>
                 <Button variant="ghost" size="sm" asChild>
                   <Link to="/profile">Profil</Link>
                 </Button>

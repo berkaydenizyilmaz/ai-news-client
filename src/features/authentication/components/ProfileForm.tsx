@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useUpdateProfile } from '../services/auth-api'
 import { useErrorHandler } from '@/hooks/use-error-handler'
+import { useAuthStore } from '@/store/auth-store'
 import type { User, UpdateProfileRequest } from '../types'
 import { User as UserIcon, Mail, AtSign, Image } from 'lucide-react'
 
@@ -30,6 +31,7 @@ export function ProfileForm({ user, onSuccess }: ProfileFormProps) {
   const [isEditing, setIsEditing] = useState(false)
   const updateProfileMutation = useUpdateProfile()
   const { handleError } = useErrorHandler()
+  const { updateUser } = useAuthStore()
 
   const {
     register,
@@ -47,6 +49,15 @@ export function ProfileForm({ user, onSuccess }: ProfileFormProps) {
   })
 
   const avatarUrl = watch('avatar_url')
+
+  // User prop'u değiştiğinde form'u yeni değerlerle reset et
+  useEffect(() => {
+    reset({
+      email: user.email,
+      username: user.username,
+      avatar_url: user.avatar_url || ''
+    })
+  }, [user, reset])
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
@@ -69,7 +80,13 @@ export function ProfileForm({ user, onSuccess }: ProfileFormProps) {
         return
       }
 
-      await updateProfileMutation.mutateAsync(updateData)
+      const response = await updateProfileMutation.mutateAsync(updateData)
+      
+      // Auth store'u güncelle
+      if (response.data) {
+        updateUser(response.data)
+      }
+      
       setIsEditing(false)
       onSuccess?.()
     } catch (error) {
