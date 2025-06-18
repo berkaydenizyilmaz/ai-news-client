@@ -23,14 +23,6 @@ export interface NewsSource {
   updated_at: string
 }
 
-export interface NewsDifference {
-  id: string
-  news_id: string
-  title: string
-  description: string
-  created_at: string
-}
-
 export interface ProcessedNews {
   id: string
   original_news_id?: string
@@ -53,7 +45,6 @@ export interface ProcessedNews {
   // İlişkili veriler
   category?: NewsCategory
   sources?: NewsSource[]
-  differences?: NewsDifference[]
   related_news?: ProcessedNews[]
 }
 

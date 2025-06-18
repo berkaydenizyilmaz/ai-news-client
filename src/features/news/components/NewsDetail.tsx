@@ -7,6 +7,7 @@ import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { useNavigate } from 'react-router-dom'
 import { useNewsDetail } from '../hooks/use-news'
+import { formatTextToParagraphs } from '@/lib/utils'
 import type { ProcessedNews } from '../types'
 
 interface NewsDetailProps {
@@ -111,19 +112,45 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
             <CardTitle className="text-lg">Özet</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground leading-relaxed">
-              {news.summary}
-            </p>
+            <div className="text-muted-foreground leading-relaxed space-y-4">
+              {formatTextToParagraphs(news.summary).map((paragraph, index) => (
+                <p key={index} className="leading-relaxed">
+                  {paragraph.split('\n').map((line, lineIndex, lines) => (
+                    <span key={lineIndex}>
+                      {line}
+                      {lineIndex < lines.length - 1 && <br />}
+                    </span>
+                  ))}
+                </p>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* Ana içerik */}
       <div className="prose prose-lg max-w-none">
-        <div 
-          className="leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: news.content }}
-        />
+        {news.content.includes('<') ? (
+          // HTML içerik varsa dangerouslySetInnerHTML kullan
+          <div 
+            className="leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: news.content }}
+          />
+        ) : (
+          // Plain text ise formatla
+          <div className="leading-relaxed space-y-4">
+            {formatTextToParagraphs(news.content).map((paragraph, index) => (
+              <p key={index} className="leading-relaxed">
+                {paragraph.split('\n').map((line, lineIndex, lines) => (
+                  <span key={lineIndex}>
+                    {line}
+                    {lineIndex < lines.length - 1 && <br />}
+                  </span>
+                ))}
+              </p>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Kaynaklar */}
@@ -164,12 +191,26 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
       {news.differences_analysis && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Kaynak Analizi</CardTitle>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <span className="text-orange-500">🔍</span>
+              Kaynak Analizi
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground leading-relaxed">
-              {news.differences_analysis}
-            </p>
+            <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4">
+              <div className="text-orange-900 dark:text-orange-100 leading-relaxed space-y-4">
+                {formatTextToParagraphs(news.differences_analysis).map((paragraph, index) => (
+                  <p key={index} className="leading-relaxed">
+                    {paragraph.split('\n').map((line, lineIndex, lines) => (
+                      <span key={lineIndex}>
+                        {line}
+                        {lineIndex < lines.length - 1 && <br />}
+                      </span>
+                    ))}
+                  </p>
+                ))}
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}

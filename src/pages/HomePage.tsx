@@ -257,7 +257,7 @@ function HomePage() {
                 <CardDescription>Ortalama AI Güven</CardDescription>
               </CardHeader>
             </Card>
-          </div>
+        </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <Card className="text-center">
@@ -266,29 +266,29 @@ function HomePage() {
                 <CardDescription>Yayında Haber</CardDescription>
               </CardHeader>
             </Card>
-            <Card className="text-center">
-              <CardHeader>
+        <Card className="text-center">
+          <CardHeader>
                 <CardTitle className="text-3xl font-bold text-primary">-</CardTitle>
                 <CardDescription>Kategori</CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="text-center">
-              <CardHeader>
+          </CardHeader>
+        </Card>
+        <Card className="text-center">
+          <CardHeader>
                 <CardTitle className="text-3xl font-bold text-primary">-</CardTitle>
                 <CardDescription>Kaynak</CardDescription>
-              </CardHeader>
-            </Card>
-            <Card className="text-center">
-              <CardHeader>
+          </CardHeader>
+        </Card>
+        <Card className="text-center">
+          <CardHeader>
                 <CardTitle className="text-3xl font-bold text-primary">-</CardTitle>
                 <CardDescription>Ortalama AI Güven</CardDescription>
-              </CardHeader>
-            </Card>
+          </CardHeader>
+        </Card>
           </div>
         )}
       </section>
     </div>
   )
-}
+} 
 
-export default HomePage
+export default HomePage 

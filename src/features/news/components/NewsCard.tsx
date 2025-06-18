@@ -96,7 +96,7 @@ export function NewsCard({ news, onClick, className }: NewsCardProps) {
         {/* Özet */}
         {news.summary && (
           <p className="text-muted-foreground text-sm leading-relaxed line-clamp-3 mb-4">
-            {news.summary}
+            {news.summary.replace(/\n+/g, ' ').trim()}
           </p>
         )}
         
