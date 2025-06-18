@@ -26,12 +26,8 @@ export function Header() {
             <Link to="/" className="text-foreground/60 hover:text-foreground transition-colors">
               Ana Sayfa
             </Link>
-
-            <Link to="/categories" className="text-foreground/60 hover:text-foreground transition-colors">
-              Kategoriler
-            </Link>
-            <Link to="/forum" className="text-foreground/60 hover:text-foreground transition-colors">
-              Forum
+            <Link to="/news" className="text-foreground/60 hover:text-foreground transition-colors">
+              Haberler
             </Link>
             {user?.role === 'admin' && (
               <Link to="/admin" className="text-foreground/60 hover:text-foreground transition-colors">

@@ -4,6 +4,8 @@ import HomePage from '@/pages/HomePage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
+import NewsPage from '@/pages/NewsPage'
+import NewsDetailPage from '@/pages/NewsDetailPage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import AdminHomePage from '@/pages/admin/AdminHomePage'
 import LogViewerPage from '@/pages/admin/LogViewerPage'
@@ -23,6 +25,14 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: 'news',
+        element: <NewsPage />,
+      },
+      {
+        path: 'news/:slug',
+        element: <NewsDetailPage />,
       },
       {
         path: 'profile',
