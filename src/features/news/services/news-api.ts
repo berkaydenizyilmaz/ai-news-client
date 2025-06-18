@@ -34,7 +34,7 @@ export const useNewsQuery = (params: NewsQueryParams = {}) => {
         }
       })
 
-      const response = await apiClient.get(`/api/news?${searchParams.toString()}`)
+      const response = await apiClient.get(`/news?${searchParams.toString()}`)
       return response.data.data
     },
     staleTime: 5 * 60 * 1000, // 5 dakika
@@ -47,7 +47,7 @@ export const useNewsDetailQuery = (id: string | undefined) => {
     queryKey: newsKeys.detail(id || ''),
     queryFn: async (): Promise<ProcessedNews> => {
       if (!id) throw new Error('News ID is required')
-      const response = await apiClient.get(`/api/news/${id}`)
+      const response = await apiClient.get(`/news/${id}`)
       return response.data.data
     },
     enabled: !!id,
@@ -68,7 +68,7 @@ export const useCategoriesQuery = (params: CategoryQueryParams = {}) => {
         }
       })
 
-      const response = await apiClient.get(`/api/news/categories?${searchParams.toString()}`)
+      const response = await apiClient.get(`/news/categories?${searchParams.toString()}`)
       return response.data.data
     },
     staleTime: 15 * 60 * 1000, // 15 dakika
@@ -80,7 +80,7 @@ export const useNewsStatisticsQuery = () => {
   return useQuery({
     queryKey: newsKeys.statistics(),
     queryFn: async (): Promise<NewsStatistics> => {
-      const response = await apiClient.get('/api/news/statistics')
+      const response = await apiClient.get('/news/statistics')
       return response.data.data
     },
     staleTime: 5 * 60 * 1000, // 5 dakika

@@ -50,12 +50,14 @@ export function NewsManagement() {
     setFilters(prev => ({ ...prev, search, page: 1 }))
   }
 
-  const handleStatusFilter = (status: NewsStatus | '') => {
-    setFilters(prev => ({ ...prev, status, page: 1 }))
+  const handleStatusFilter = (status: string) => {
+    const statusValue = status === 'all' ? '' : status as NewsStatus
+    setFilters(prev => ({ ...prev, status: statusValue, page: 1 }))
   }
 
   const handleCategoryFilter = (category: string) => {
-    setFilters(prev => ({ ...prev, category, page: 1 }))
+    const categoryValue = category === 'all' ? '' : category
+    setFilters(prev => ({ ...prev, category: categoryValue, page: 1 }))
   }
 
   const handlePageChange = (page: number) => {
@@ -181,12 +183,12 @@ export function NewsManagement() {
             </div>
 
             {/* Status Filter */}
-            <Select value={filters.status} onValueChange={handleStatusFilter}>
+            <Select value={filters.status || undefined} onValueChange={handleStatusFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Durum seçin" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tüm Durumlar</SelectItem>
+                <SelectItem value="all">Tüm Durumlar</SelectItem>
                 <SelectItem value="published">Yayında</SelectItem>
                 <SelectItem value="pending">Beklemede</SelectItem>
                 <SelectItem value="processing">İşleniyor</SelectItem>
@@ -195,12 +197,12 @@ export function NewsManagement() {
             </Select>
 
             {/* Category Filter */}
-            <Select value={filters.category} onValueChange={handleCategoryFilter}>
+            <Select value={filters.category || undefined} onValueChange={handleCategoryFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Kategori seçin" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tüm Kategoriler</SelectItem>
+                <SelectItem value="all">Tüm Kategoriler</SelectItem>
                 {categoriesData?.categories.map((category: NewsCategory) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
