@@ -5,7 +5,8 @@ import type {
   NewsListResponse, 
   NewsStatistics,
   NewsQueryParams,
-  CategoryQueryParams 
+  CategoryQueryParams,
+  NewsStatus
 } from '../types'
 
 // Query Keys
@@ -91,20 +92,26 @@ export const useCreateNewsMutation = () => {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: async (newsData: {
+    mutationFn: async (data: {
       title: string
       content: string
       summary?: string
       image_url?: string
-      category_id?: string
+      category_id: string
+      status: NewsStatus
+      tags?: string[]
+      meta_title?: string
+      meta_description?: string
     }) => {
-      const response = await apiClient.post('/api/news', newsData)
-      return response.data.data
+      const response = await apiClient.post('/news', data)
+      return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: newsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: newsKeys.statistics() })
+      queryClient.invalidateQueries({ queryKey: ['news'] })
     },
+    onError: (error) => {
+      console.error('News oluşturma hatası:', error)
+    }
   })
 }
 
@@ -113,18 +120,30 @@ export const useUpdateNewsMutation = () => {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: async ({ id, data }: { 
+    mutationFn: async ({ id, data }: {
       id: string
-      data: Partial<ProcessedNews>
+      data: Partial<{
+        title: string
+        content: string
+        summary?: string
+        image_url?: string
+        category_id: string
+        status: NewsStatus
+        tags?: string[]
+        meta_title?: string
+        meta_description?: string
+      }>
     }) => {
-      const response = await apiClient.put(`/api/news/${id}`, data)
-      return response.data.data
+      const response = await apiClient.put(`/news/${id}`, data)
+      return response.data
     },
     onSuccess: (_, { id }) => {
-      queryClient.invalidateQueries({ queryKey: newsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: newsKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: newsKeys.statistics() })
+      queryClient.invalidateQueries({ queryKey: ['news'] })
+      queryClient.invalidateQueries({ queryKey: ['news', id] })
     },
+    onError: (error) => {
+      console.error('News güncelleme hatası:', error)
+    }
   })
 }
 
@@ -133,13 +152,16 @@ export const useDeleteNewsMutation = () => {
   const queryClient = useQueryClient()
   
   return useMutation({
-    mutationFn: async (id: string) => {
-      const response = await apiClient.delete(`/api/news/${id}`)
+    mutationFn: async (newsId: string) => {
+      const response = await apiClient.delete(`/news/${newsId}`)
       return response.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: newsKeys.lists() })
-      queryClient.invalidateQueries({ queryKey: newsKeys.statistics() })
+      // Tüm news cache'lerini invalidate et
+      queryClient.invalidateQueries({ queryKey: ['news'] })
     },
+    onError: (error) => {
+      console.error('News silme hatası:', error)
+    }
   })
 } 

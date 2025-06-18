@@ -47,6 +47,9 @@ export interface ProcessedNews {
   published_at?: string
   created_at: string
   updated_at: string
+  tags?: string[]
+  meta_title?: string
+  meta_description?: string
   // İlişkili veriler
   category?: NewsCategory
   sources?: NewsSource[]

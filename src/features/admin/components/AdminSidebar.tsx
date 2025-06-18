@@ -13,7 +13,8 @@ import {
   X,
   ChevronLeft,
   Shield,
-  Rss
+  Rss,
+  Newspaper
 } from 'lucide-react'
 
 interface AdminSidebarProps {
@@ -26,6 +27,11 @@ const sidebarItems = [
     href: '/admin',
     icon: Home,
     exact: true
+  },
+  {
+    title: 'Haber Yönetimi',
+    href: '/admin/news',
+    icon: Newspaper
   },
   {
     title: 'RSS Kaynakları',

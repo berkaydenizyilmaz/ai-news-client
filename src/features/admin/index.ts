@@ -8,6 +8,9 @@ export { SettingsForm } from './components/SettingsForm'
 export { RssSourcesList } from './components/RssSourcesList'
 export { RssSourceForm } from './components/RssSourceForm'
 export { UsersList } from './components/UsersList'
+export { NewsManagement } from './components/NewsManagement'
+export { NewsTable } from './components/NewsTable'
+export { NewsForm } from './components/NewsForm'
 
 // API Services
 export { 

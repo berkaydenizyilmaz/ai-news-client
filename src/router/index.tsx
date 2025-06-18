@@ -9,6 +9,7 @@ import NewsDetailPage from '@/pages/NewsDetailPage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import AdminHomePage from '@/pages/admin/AdminHomePage'
 import LogViewerPage from '@/pages/admin/LogViewerPage'
+import NewsManagementPage from '@/pages/admin/NewsManagementPage'
 import { RssPage } from '@/pages/admin/RssPage'
 import { SettingsPage } from '@/pages/admin/SettingsPage'
 import { UsersPage } from '@/pages/admin/UsersPage'
@@ -53,6 +54,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <AdminHomePage />,
+      },
+      {
+        path: 'news',
+        element: <NewsManagementPage />,
       },
       {
         path: 'logs',
