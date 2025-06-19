@@ -14,6 +14,7 @@ import {
 import { useAuthStore } from '@/store/auth-store'
 import { useTopicPosts, useDeleteForumPost } from '../hooks/use-forum'
 import { PostForm } from './PostForm'
+import { ReportButton } from '@/components/common/ReportButton'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import type { PostsQueryParams } from '../types'
@@ -179,15 +180,28 @@ export function PostList({ topicId }: PostListProps) {
                   </div>
 
                   {!post.is_deleted && (
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground border-t pt-4">
-                      <div className="flex items-center gap-1">
-                        <ThumbsUp className="h-4 w-4" />
-                        <span>{post.like_count}</span>
+                    <div className="flex items-center justify-between border-t pt-4">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <ThumbsUp className="h-4 w-4" />
+                          <span>{post.like_count}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <ThumbsDown className="h-4 w-4" />
+                          <span>{post.dislike_count}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <ThumbsDown className="h-4 w-4" />
-                        <span>{post.dislike_count}</span>
-                      </div>
+                      
+                      {/* Report button - only show if user is logged in and it's not their own post */}
+                      {user && user.id !== post.user.id && (
+                        <ReportButton
+                          reportedType="forum_post"
+                          reportedId={post.id}
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs"
+                        />
+                      )}
                     </div>
                   )}
                 </>

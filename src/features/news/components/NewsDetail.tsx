@@ -12,6 +12,7 @@ import { formatTextToParagraphs } from '@/lib/utils'
 import { ReportForm } from '@/features/reports'
 import { useAuthStore } from '@/store/auth-store'
 import { useState } from 'react'
+import { ReportButton } from '@/components/common/ReportButton'
 
 interface NewsDetailProps {
   news: any
@@ -20,8 +21,9 @@ interface NewsDetailProps {
 export function NewsDetail({ news }: NewsDetailProps) {
   const navigate = useNavigate()
   const { user } = useAuthStore()
-  const [showReportDialog, setShowReportDialog] = useState(false)
   const { data: newsData, isLoading, isError, error, refetch } = useNewsDetail(news.id)
+
+
 
   if (isLoading) {
     return <NewsDetailSkeleton />
@@ -63,23 +65,13 @@ export function NewsDetail({ news }: NewsDetailProps) {
             Geri Dön
           </Button>
           <div className="flex items-center gap-2">
-            {user && (
-              <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-                <DialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2 text-orange-600 hover:text-orange-700">
-                    <AlertTriangle className="h-4 w-4" />
-                    Şikayet Et
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <ReportForm
-                    reportedType="news"
-                    reportedId={newsData?.id || ''}
-                    onSuccess={() => setShowReportDialog(false)}
-                    onCancel={() => setShowReportDialog(false)}
-                  />
-                </DialogContent>
-              </Dialog>
+            {newsData?.id && (
+              <ReportButton
+                reportedType="news"
+                reportedId={newsData.id}
+                variant="ghost"
+                size="sm"
+              />
             )}
             <Button variant="ghost" size="sm" className="gap-2">
               <Share2 className="h-4 w-4" />

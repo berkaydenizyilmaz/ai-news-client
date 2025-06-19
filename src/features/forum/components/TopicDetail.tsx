@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -13,12 +13,20 @@ import {
   Lock, 
   Edit, 
   Trash2,
-  Reply
+  Reply,
+  MoreHorizontal
 } from 'lucide-react'
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
 import { useAuthStore } from '@/store/auth-store'
 import { useForumTopic, useDeleteForumTopic } from '../hooks/use-forum'
 import { PostForm } from './PostForm'
 import { PostList } from './PostList'
+import { ReportButton } from '@/components/common/ReportButton'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
@@ -166,19 +174,32 @@ export function TopicDetail({ topicId, onBack, onEdit }: TopicDetailProps) {
             <p className="whitespace-pre-wrap">{topic.content}</p>
           </div>
           
-          <div className="flex items-center gap-6 text-sm text-muted-foreground border-t pt-4">
-            <div className="flex items-center gap-1">
-              <MessageSquare className="h-4 w-4" />
-              <span>{topic.reply_count} yanıt</span>
+          <div className="flex items-center justify-between border-t pt-4">
+            <div className="flex items-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <MessageSquare className="h-4 w-4" />
+                <span>{topic.reply_count} yanıt</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Eye className="h-4 w-4" />
+                <span>{topic.view_count} görüntülenme</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <ThumbsUp className="h-4 w-4" />
+                <span>{topic.like_count} beğeni</span>
+              </div>
             </div>
-            <div className="flex items-center gap-1">
-              <Eye className="h-4 w-4" />
-              <span>{topic.view_count} görüntülenme</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <ThumbsUp className="h-4 w-4" />
-              <span>{topic.like_count} beğeni</span>
-            </div>
+            
+            {/* Report button - only show if user is logged in and it's not their own topic */}
+            {user && user.id !== topic.user.id && (
+              <ReportButton
+                reportedType="forum_topic"
+                reportedId={topic.id}
+                variant="ghost"
+                size="sm"
+                className="text-xs"
+              />
+            )}
           </div>
         </CardContent>
       </Card>

@@ -33,15 +33,15 @@ const TYPE_LABELS = {
 
 export const ReportsList = () => {
   const [page, setPage] = useState(1);
-  const [status, setStatus] = useState<ReportStatus | ''>('');
-  const [reportedType, setReportedType] = useState<ReportedType | ''>('');
+  const [status, setStatus] = useState<ReportStatus | 'all'>('all');
+  const [reportedType, setReportedType] = useState<ReportedType | 'all'>('all');
   const [search, setSearch] = useState('');
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
 
   const { data, isLoading, error } = useReports({
     page,
-    status: status || undefined,
-    reported_type: reportedType || undefined,
+    status: status === 'all' ? undefined : status,
+    reported_type: reportedType === 'all' ? undefined : reportedType,
     search: search || undefined,
   });
 
@@ -51,8 +51,8 @@ export const ReportsList = () => {
   };
 
   const resetFilters = () => {
-    setStatus('');
-    setReportedType('');
+    setStatus('all');
+    setReportedType('all');
     setSearch('');
     setPage(1);
   };
@@ -93,12 +93,12 @@ export const ReportsList = () => {
               </div>
             </form>
 
-            <Select value={status} onValueChange={setStatus}>
+            <Select value={status} onValueChange={(value) => setStatus(value as ReportStatus | 'all')}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Durum" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tüm Durumlar</SelectItem>
+                <SelectItem value="all">Tüm Durumlar</SelectItem>
                 <SelectItem value="pending">Bekliyor</SelectItem>
                 <SelectItem value="reviewed">İncelendi</SelectItem>
                 <SelectItem value="resolved">Çözüldü</SelectItem>
@@ -106,12 +106,12 @@ export const ReportsList = () => {
               </SelectContent>
             </Select>
 
-            <Select value={reportedType} onValueChange={setReportedType}>
+            <Select value={reportedType} onValueChange={(value) => setReportedType(value as ReportedType | 'all')}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Tür" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tüm Türler</SelectItem>
+                <SelectItem value="all">Tüm Türler</SelectItem>
                 <SelectItem value="news">Haber</SelectItem>
                 <SelectItem value="comment">Yorum</SelectItem>
                 <SelectItem value="forum_post">Forum Gönderisi</SelectItem>

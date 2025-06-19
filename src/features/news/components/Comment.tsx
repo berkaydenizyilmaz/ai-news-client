@@ -33,6 +33,7 @@ import {
 import { useAuthStore } from '@/store/auth-store'
 import { useDeleteComment } from '../hooks/use-comments'
 import { CommentForm } from './CommentForm'
+import { ReportButton } from '@/components/common/ReportButton'
 import type { CommentWithUser } from '../types'
 
 interface CommentProps {
@@ -247,6 +248,17 @@ export function Comment({
                 )}
                 {comment.replies.length} yanıt {showReplies ? 'gizle' : 'göster'}
               </Button>
+            )}
+
+            {/* Report button - only show if user is logged in and it's not their own comment */}
+            {user && user.id !== comment.user?.id && !comment.is_deleted && (
+              <ReportButton
+                reportedType="comment"
+                reportedId={comment.id}
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs"
+              />
             )}
           </div>
 

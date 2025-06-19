@@ -3,11 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertTriangle } from 'lucide-react';
 import { useCreateReport } from '../hooks/use-reports';
 import type { ReportedType } from '../types';
+import { AxiosError } from 'axios';
 
 interface ReportFormProps {
   reportedType: ReportedType;
@@ -33,18 +33,26 @@ export const ReportForm = ({ reportedType, reportedId, onSuccess, onCancel }: Re
     
     if (!reason.trim()) return;
 
+    const reportData = {
+      reported_type: reportedType,
+      reported_id: reportedId,
+      reason: reason.trim(),
+      description: description.trim() || undefined,
+    };
+
     createReportMutation.mutate(
-      {
-        reported_type: reportedType,
-        reported_id: reportedId,
-        reason: reason.trim(),
-        description: description.trim() || undefined,
-      },
+      reportData,
       {
         onSuccess: () => {
           setReason('');
           setDescription('');
           onSuccess?.();
+        },
+        onError: (error: unknown) => {
+          console.error('Report creation error:', error);
+          if (error && typeof error === 'object' && 'response' in error) {
+            console.error('Error response:', (error as any).response?.data);
+          }
         },
       }
     );
