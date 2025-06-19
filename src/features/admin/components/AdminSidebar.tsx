@@ -14,7 +14,8 @@ import {
   ChevronLeft,
   Shield,
   Rss,
-  Newspaper
+  Newspaper,
+  AlertTriangle
 } from 'lucide-react'
 
 interface AdminSidebarProps {
@@ -47,6 +48,11 @@ const sidebarItems = [
     title: 'Kullanıcılar',
     href: '/admin/users',
     icon: Users
+  },
+  {
+    title: 'Şikayetler',
+    href: '/admin/reports',
+    icon: AlertTriangle
   },
   {
     title: 'Loglar',

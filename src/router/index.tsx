@@ -16,6 +16,7 @@ import NewsManagementPage from '@/pages/admin/NewsManagementPage'
 import { RssPage } from '@/pages/admin/RssPage'
 import { SettingsPage } from '@/pages/admin/SettingsPage'
 import { UsersPage } from '@/pages/admin/UsersPage'
+import ReportsPage from '@/pages/admin/ReportsPage'
 import { requireAuth, requireAdmin, redirectIfAuthenticated } from './auth-loader'
 import { AdminLayout } from '@/router/AdminLayout'
 
@@ -90,6 +91,10 @@ export const router = createBrowserRouter([
       {
         path: 'users',
         element: <UsersPage />,
+      },
+      {
+        path: 'reports',
+        element: <ReportsPage />,
       },
     ],
   },
