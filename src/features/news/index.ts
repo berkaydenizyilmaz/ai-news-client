@@ -4,36 +4,33 @@
 export { NewsCard } from './components/NewsCard'
 export { NewsList } from './components/NewsList'
 export { NewsDetail } from './components/NewsDetail'
-export { NewsSearch } from './components/NewsSearch'
 export { CategoryFilter } from './components/CategoryFilter'
-export { CommentForm } from './components/CommentForm'
-export { Comment } from './components/Comment'
+export { NewsSearch } from './components/NewsSearch'
 export { CommentsSection } from './components/CommentsSection'
+export { CommentForm } from './components/CommentForm'
+export { Comment as NewsComment } from './components/Comment'
 
 // Hooks
 export { 
-  useNews, 
-  useNewsDetail, 
-  useCategories, 
-  useCategoriesQuery, 
+  useNews,
+  useNewsDetail,
+  useCategories,
+  useCategoriesQuery,
   useNewsStatistics,
-  useHomePageNews, 
+  useHomePageNews,
   useNewsFilters,
   useCreateNews,
   useUpdateNews,
-  useDeleteNews,
-  newsKeys
+  useDeleteNews
 } from './hooks/use-news'
-export { 
-  useNewsComments, 
-  useComment, 
-  useCreateComment, 
-  useUpdateComment, 
-  useDeleteComment, 
-  useModerationComments, 
-  useCommentStatistics,
-  useOptimisticComments,
-  commentKeys
+
+export {
+  useNewsComments,
+  useComment,
+  useCreateComment,
+  useUpdateComment,
+  useDeleteComment,
+  useCommentStatistics
 } from './hooks/use-comments'
 
 // Services
@@ -41,27 +38,16 @@ export * from './services/news-api'
 export * from './services/comments-api'
 
 // Types
-export type { 
-  ProcessedNews, 
-  NewsCategory, 
-  NewsSource, 
-  NewsFilters, 
-  NewsResponse,
-  NewsStatus,
+export type {
+  ProcessedNews,
+  NewsListResponse,
   NewsQueryParams,
   CategoryQueryParams,
-  NewsListResponse,
   NewsStatistics,
-  Comment,
-  CommentUser,
+  NewsStatus,
+  NewsCategory,
   CommentWithUser,
-  CommentTreeNode,
-  CreateCommentData,
-  UpdateCommentData,
-  CommentModerationData,
-  CommentStatistics,
-  CommentsResponse,
   CommentQueryParams,
-  CommentStatus,
-  CommentModerationAction
+  CommentStatistics,
+  CommentsResponse
 } from './types' 

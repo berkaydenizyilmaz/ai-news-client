@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -21,7 +20,7 @@ export function NewsList({
   className 
 }: NewsListProps) {
   const navigate = useNavigate()
-  const { data, isLoading, isError, error, refetch, params: currentParams, updateParams } = useNews(params)
+  const { data, isLoading, isError, refetch, params: currentParams, updateParams } = useNews(params)
   
   const handleNewsClick = (newsSlug: string) => {
     navigate(`/news/${newsSlug}`)

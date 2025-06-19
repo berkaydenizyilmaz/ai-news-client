@@ -1,16 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useErrorHandler } from '@/hooks/use-error-handler'
-import type { 
-  CommentWithUser, 
-  CreateCommentData, 
-  UpdateCommentData, 
-  CommentModerationData,
-  CommentStatistics,
-  CommentsResponse,
-  CommentQueryParams
-} from '../types'
 import * as commentsApi from '../services/comments-api'
+import type { 
+  CommentWithUser,
+  CommentQueryParams,
+  CommentsResponse,
+  UpdateCommentData
+} from '../types'
 
 // Query keys
 export const commentKeys = {
@@ -23,31 +20,22 @@ export const commentKeys = {
 }
 
 // Haber yorumlarını getir
-export const useNewsComments = (
-  newsId: string, 
-  params: CommentQueryParams = {},
-  enabled = true
-) => {
-  const { handleError } = useErrorHandler()
-
+export const useNewsComments = (newsId: string, params: CommentQueryParams = {}) => {
   return useQuery({
     queryKey: commentKeys.newsCommentsWithParams(newsId, params),
     queryFn: () => commentsApi.getNewsComments(newsId, params),
-    enabled: enabled && !!newsId,
-    staleTime: 30 * 1000, // 30 saniye
-    onError: handleError,
+    enabled: !!newsId,
+    staleTime: 2 * 60 * 1000, // 2 dakika
   })
 }
 
 // Yorum detayı
-export const useComment = (commentId: string, enabled = true) => {
-  const { handleError } = useErrorHandler()
-
+export const useComment = (commentId: string | undefined) => {
   return useQuery({
-    queryKey: commentKeys.comment(commentId),
-    queryFn: () => commentsApi.getComment(commentId),
-    enabled: enabled && !!commentId,
-    onError: handleError,
+    queryKey: commentKeys.comment(commentId || ''),
+    queryFn: () => commentsApi.getComment(commentId!),
+    enabled: !!commentId,
+    staleTime: 5 * 60 * 1000, // 5 dakika
   })
 }
 
@@ -55,16 +43,18 @@ export const useComment = (commentId: string, enabled = true) => {
 export const useCreateComment = () => {
   const queryClient = useQueryClient()
   const { handleError } = useErrorHandler()
-
+  
   return useMutation({
     mutationFn: commentsApi.createComment,
-    onSuccess: (newComment, variables) => {
-      // İlgili haber yorumları cache'ini güncelle
-      queryClient.invalidateQueries({
-        queryKey: commentKeys.newsComments(variables.processed_news_id)
+    onSuccess: (_, variables) => {
+      // İlgili haber yorumlarını yenile
+      queryClient.invalidateQueries({ 
+        queryKey: commentKeys.newsComments(variables.processed_news_id) 
       })
-      
-      toast.success('Yorum başarıyla eklendi')
+      // Genel istatistikleri yenile
+      queryClient.invalidateQueries({ 
+        queryKey: commentKeys.statistics() 
+      })
     },
     onError: handleError,
   })
@@ -100,16 +90,12 @@ export const useUpdateComment = () => {
 export const useDeleteComment = () => {
   const queryClient = useQueryClient()
   const { handleError } = useErrorHandler()
-
+  
   return useMutation({
     mutationFn: commentsApi.deleteComment,
-    onSuccess: (_, commentId) => {
-      // Tüm yorum cache'lerini güncelle
-      queryClient.invalidateQueries({
-        queryKey: commentKeys.all
-      })
-      
-      toast.success('Yorum başarıyla silindi')
+    onSuccess: () => {
+      // Tüm yorum sorgularını yenile
+      queryClient.invalidateQueries({ queryKey: commentKeys.all })
     },
     onError: handleError,
   })
@@ -137,15 +123,11 @@ export const useModerationComments = () => {
 }
 
 // Yorum istatistikleri
-export const useCommentStatistics = (enabled = true) => {
-  const { handleError } = useErrorHandler()
-
+export const useCommentStatistics = () => {
   return useQuery({
     queryKey: commentKeys.statistics(),
-    queryFn: commentsApi.getCommentStatistics,
-    enabled,
+    queryFn: () => commentsApi.getCommentStatistics(),
     staleTime: 5 * 60 * 1000, // 5 dakika
-    onError: handleError,
   })
 }
 

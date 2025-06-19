@@ -53,14 +53,13 @@ export function Comment({
   onEdit 
 }: CommentProps) {
   const { user } = useAuthStore()
+  const deleteComment = useDeleteComment()
+  
   const [showReplies, setShowReplies] = useState(true)
   const [showReplyForm, setShowReplyForm] = useState(false)
   const [showEditForm, setShowEditForm] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   
-  const deleteCommentMutation = useDeleteComment()
-
-  const isOwner = user?.id === comment.user_id
   const isModerator = user?.role === 'moderator' || user?.role === 'admin'
   const canReply = depth < maxDepth && !comment.is_deleted
   const canEdit = comment.can_edit && !comment.is_deleted
@@ -84,10 +83,10 @@ export function Comment({
 
   const handleDelete = async () => {
     try {
-      await deleteCommentMutation.mutateAsync(comment.id)
+      await deleteComment.mutateAsync(comment.id)
       setShowDeleteDialog(false)
     } catch (error) {
-      // Error handling is done by the hook
+      console.error('Comment deletion failed:', error)
     }
   }
 
@@ -303,9 +302,9 @@ export function Comment({
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              disabled={deleteCommentMutation.isPending}
+              disabled={deleteComment.isPending}
             >
-              {deleteCommentMutation.isPending ? 'Siliniyor...' : 'Sil'}
+              {deleteComment.isPending ? 'Siliniyor...' : 'Sil'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

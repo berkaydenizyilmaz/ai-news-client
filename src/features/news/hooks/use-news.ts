@@ -3,12 +3,8 @@ import { useState, useCallback } from 'react'
 import { useErrorHandler } from '@/hooks/use-error-handler'
 import * as newsApi from '../services/news-api'
 import type { 
-  ProcessedNews, 
-  NewsListResponse, 
   NewsQueryParams, 
-  CategoryQueryParams,
-  NewsStatistics,
-  NewsStatus
+  CategoryQueryParams
 } from '../types'
 
 // Query Keys
@@ -25,7 +21,6 @@ export const newsKeys = {
 
 // Haber listesi hook'u
 export const useNews = (initialParams: NewsQueryParams = {}) => {
-  const { handleError } = useErrorHandler()
   const [params, setParams] = useState<NewsQueryParams>({
     page: 1,
     limit: 12,
@@ -42,7 +37,6 @@ export const useNews = (initialParams: NewsQueryParams = {}) => {
     queryKey: newsKeys.list(params),
     queryFn: () => newsApi.getNews(params),
     staleTime: 5 * 60 * 1000, // 5 dakika
-    onError: handleError,
   })
   
   return {
@@ -54,26 +48,20 @@ export const useNews = (initialParams: NewsQueryParams = {}) => {
 
 // Haber detayı hook'u
 export const useNewsDetail = (id: string | undefined) => {
-  const { handleError } = useErrorHandler()
-  
   return useQuery({
     queryKey: newsKeys.detail(id || ''),
     queryFn: () => newsApi.getNewsDetail(id!),
     enabled: !!id,
     staleTime: 10 * 60 * 1000, // 10 dakika
-    onError: handleError,
   })
 }
 
 // Kategoriler hook'u
 export const useCategories = (params: CategoryQueryParams = {}) => {
-  const { handleError } = useErrorHandler()
-  
   return useQuery({
     queryKey: newsKeys.categoryList(params),
     queryFn: () => newsApi.getCategories(params),
     staleTime: 15 * 60 * 1000, // 15 dakika
-    onError: handleError,
   })
 }
 
@@ -82,13 +70,10 @@ export const useCategoriesQuery = useCategories
 
 // İstatistikler hook'u
 export const useNewsStatistics = () => {
-  const { handleError } = useErrorHandler()
-  
   return useQuery({
     queryKey: newsKeys.statistics(),
     queryFn: () => newsApi.getNewsStatistics(),
     staleTime: 5 * 60 * 1000, // 5 dakika
-    onError: handleError,
   })
 }
 
@@ -109,8 +94,8 @@ export const useHomePageNews = () => {
   const statisticsQuery = useNewsStatistics()
 
   return {
-    latestNews: latestNewsQuery.data?.news || [],
-    categories: categoriesQuery.data?.categories || [],
+    latestNews: (latestNewsQuery.data as any)?.news || [],
+    categories: (categoriesQuery.data as any)?.categories || [],
     statistics: statisticsQuery.data,
     isLoading: latestNewsQuery.isLoading || categoriesQuery.isLoading || statisticsQuery.isLoading,
     isError: latestNewsQuery.isError || categoriesQuery.isError || statisticsQuery.isError,
@@ -145,7 +130,7 @@ export const useNewsFilters = () => {
   // Filtreleri NewsQueryParams formatında döndür
   const filters: NewsQueryParams = {
     search: search || undefined,
-    category: selectedCategory || undefined,
+    category_id: selectedCategory || undefined,
     sort_by: sortBy,
     sort_order: sortOrder,
   }

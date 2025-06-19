@@ -1,29 +1,27 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { AlertCircle, ArrowLeft, Calendar, Eye, ExternalLink, Share2 } from 'lucide-react'
+import { AlertCircle, ArrowLeft, Share2, Calendar, Eye, ExternalLink } from 'lucide-react'
+import { CommentsSection } from './CommentsSection'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { useNavigate } from 'react-router-dom'
 import { useNewsDetail } from '../hooks/use-news'
 import { formatTextToParagraphs } from '@/lib/utils'
-import type { ProcessedNews } from '../types'
-import { CommentsSection } from './CommentsSection'
 
 interface NewsDetailProps {
-  newsId: string
+  news: any
 }
 
-export function NewsDetail({ newsId }: NewsDetailProps) {
+export function NewsDetail({ news }: NewsDetailProps) {
   const navigate = useNavigate()
-  const { data: news, isLoading, isError, error, refetch } = useNewsDetail(newsId)
+  const { data: newsData, isLoading, isError, error, refetch } = useNewsDetail(news.id)
 
   if (isLoading) {
     return <NewsDetailSkeleton />
   }
 
-  if (isError || !news) {
+  if (isError || !newsData) {
     return (
       <div className="max-w-4xl mx-auto text-center py-16">
         <AlertCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
@@ -66,11 +64,11 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
 
         <div className="p-6 space-y-8">
           {/* Hero Image */}
-          {news.image_url && (
+          {newsData.image_url && (
             <div className="relative aspect-[21/9] overflow-hidden rounded-2xl shadow-2xl">
               <img 
-                src={news.image_url} 
-                alt={news.title}
+                src={newsData.image_url} 
+                alt={newsData.title}
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -78,12 +76,12 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
               {/* Floating badges on image */}
               <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
                 <div className="flex gap-2">
-                  {news.category && (
+                  {newsData.category && (
                     <Badge className="bg-white/20 backdrop-blur-sm text-white border-white/30">
-                      {news.category.name}
+                      {newsData.category.name}
                     </Badge>
                   )}
-                  {news.confidence_score && news.confidence_score > 0.8 && (
+                  {newsData.confidence_score && newsData.confidence_score > 0.8 && (
                     <Badge className="bg-green-500/20 backdrop-blur-sm text-green-100 border-green-300/30">
                       ✨ AI Onaylı
                     </Badge>
@@ -96,30 +94,30 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
           {/* Article Header */}
           <header className="space-y-6">
             {/* Badges for non-image layout */}
-            {!news.image_url && (
+            {!newsData.image_url && (
               <div className="flex flex-wrap gap-2">
-                {news.category && (
+                {newsData.category && (
                   <Badge variant="secondary" className="text-sm px-3 py-1">
-                    {news.category.name}
+                    {newsData.category.name}
                   </Badge>
                 )}
-                {news.confidence_score && (
+                {newsData.confidence_score && (
                   <Badge 
-                    variant={news.confidence_score > 0.8 ? 'default' : 'outline'}
+                    variant={newsData.confidence_score > 0.8 ? 'default' : 'outline'}
                     className="text-sm px-3 py-1"
                   >
-                    🤖 AI Güven: %{Math.round(news.confidence_score * 100)}
+                    🤖 AI Güven: %{Math.round(newsData.confidence_score * 100)}
                   </Badge>
                 )}
                 <Badge variant="outline" className="text-sm px-3 py-1">
-                  {news.status === 'published' ? '✅ Yayında' : '⏳ Beklemede'}
+                  {newsData.status === 'published' ? '✅ Yayında' : '⏳ Beklemede'}
                 </Badge>
               </div>
             )}
 
             {/* Title */}
             <h1 className="text-4xl md:text-5xl font-black leading-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text">
-              {news.title}
+              {newsData.title}
             </h1>
 
             {/* Meta Info */}
@@ -127,23 +125,23 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
                 <time className="font-medium">
-                  {format(new Date(news.published_at || news.created_at), 'dd MMMM yyyy, HH:mm', { locale: tr })}
+                  {format(new Date(newsData.published_at || newsData.created_at), 'dd MMMM yyyy, HH:mm', { locale: tr })}
                 </time>
               </div>
               
               <div className="flex items-center gap-2">
                 <Eye className="h-5 w-5" />
-                <span className="font-medium">{news.view_count.toLocaleString('tr-TR')} görüntülenme</span>
+                <span className="font-medium">{newsData.view_count.toLocaleString('tr-TR')} görüntülenme</span>
               </div>
             </div>
           </header>
 
           {/* Summary */}
-          {news.summary && (
+          {newsData.summary && (
             <div className="bg-primary/5 border-l-4 border-primary rounded-r-xl p-6">
               <h2 className="text-xl font-bold mb-4 text-primary">📋 Özet</h2>
               <div className="text-lg leading-relaxed space-y-4 text-muted-foreground">
-                {formatTextToParagraphs(news.summary).map((paragraph, index) => (
+                {formatTextToParagraphs(newsData.summary).map((paragraph, index) => (
                   <p key={index} className="leading-relaxed">
                     {paragraph.split('\n').map((line, lineIndex, lines) => (
                       <span key={lineIndex}>
@@ -159,14 +157,14 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
 
           {/* Main Content */}
           <div className="prose prose-lg prose-gray dark:prose-invert max-w-none">
-            {news.content.includes('<') ? (
+            {newsData.content.includes('<') ? (
               <div 
                 className="leading-relaxed text-lg"
-                dangerouslySetInnerHTML={{ __html: news.content }}
+                dangerouslySetInnerHTML={{ __html: newsData.content }}
               />
             ) : (
               <div className="leading-relaxed space-y-6 text-lg">
-                {formatTextToParagraphs(news.content).map((paragraph, index) => (
+                {formatTextToParagraphs(newsData.content).map((paragraph, index) => (
                   <p key={index} className="leading-relaxed">
                     {paragraph.split('\n').map((line, lineIndex, lines) => (
                       <span key={lineIndex}>
@@ -181,7 +179,7 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
           </div>
 
           {/* Source Analysis */}
-          {news.differences_analysis && (
+          {newsData.differences_analysis && (
             <div className="bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 border border-orange-200 dark:border-orange-800 rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
@@ -192,7 +190,7 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
                 </h2>
               </div>
               <div className="text-orange-900 dark:text-orange-100 leading-relaxed space-y-4">
-                {formatTextToParagraphs(news.differences_analysis).map((paragraph, index) => (
+                {formatTextToParagraphs(newsData.differences_analysis).map((paragraph, index) => (
                   <p key={index} className="leading-relaxed">
                     {paragraph.split('\n').map((line, lineIndex, lines) => (
                       <span key={lineIndex}>
@@ -207,14 +205,14 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
           )}
 
           {/* Related News */}
-          {news.related_news && news.related_news.length > 0 && (
+          {newsData.related_news && newsData.related_news.length > 0 && (
             <div className="bg-muted/30 rounded-2xl p-6">
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                 <span>🔗</span>
                 İlgili Haberler
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {news.related_news.map((relatedNews) => (
+                {newsData.related_news.map((relatedNews) => (
                   <div 
                     key={relatedNews.id}
                     className="group p-4 bg-background rounded-xl border hover:shadow-lg cursor-pointer transition-all duration-300 hover:-translate-y-1"
@@ -235,15 +233,15 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
           )}
 
           {/* Sources - Moved to bottom and minimized */}
-          {news.sources && news.sources.length > 0 && (
+          {newsData.sources && newsData.sources.length > 0 && (
             <div className="border-t pt-8 mt-12">
               <details className="group">
                 <summary className="flex items-center gap-2 cursor-pointer text-muted-foreground hover:text-foreground transition-colors">
-                  <span className="text-sm font-medium">📚 Kaynaklar ({news.sources.length})</span>
+                  <span className="text-sm font-medium">📚 Kaynaklar ({newsData.sources.length})</span>
                   <span className="text-xs group-open:rotate-180 transition-transform">▼</span>
                 </summary>
                 <div className="mt-4 space-y-2">
-                  {news.sources.map((source) => (
+                  {newsData.sources.map((source) => (
                     <div key={source.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg text-sm">
                       <div className="flex items-center gap-2">
                         <span className="font-medium">{source.source_name}</span>
@@ -275,8 +273,8 @@ export function NewsDetail({ newsId }: NewsDetailProps) {
 
       {/* Comments Section */}
       <CommentsSection 
-        newsId={news.id} 
-        newsTitle={news.title}
+        newsId={newsData.id} 
+        newsTitle={newsData.title}
         className="max-w-4xl mx-auto mt-12"
       />
     </div>

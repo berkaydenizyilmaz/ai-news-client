@@ -46,8 +46,8 @@ export function UsersList() {
   const updateFilter = (key: keyof GetUsersQuery, value: string | number | boolean | undefined) => {
     setFilters(prev => ({
       ...prev,
-      [key]: value === '' || value === 'all' ? undefined : value,
-      offset: key !== 'offset' ? 0 : value, // Filtre değiştiğinde ilk sayfaya dön
+      [key]: value,
+      offset: key !== 'offset' ? 0 : (typeof value === 'number' ? value : 0), // Filtre değiştiğinde ilk sayfaya dön
     }))
   }
 

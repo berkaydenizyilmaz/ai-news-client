@@ -20,11 +20,14 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 // Admin ana sayfası bileşeni
 // Admin panelinin genel görünümünü ve hızlı erişim linklerini sağlar
 export function AdminHome() {
-  // API verilerini çek
-  const { data: newsStats, isLoading: newsLoading, isError: newsError } = useNewsStatistics()
-  const { data: usersStats, isLoading: usersLoading, isError: usersError } = useUsersStatistics()
-  const { data: logStats, isLoading: logLoading, isError: logError } = useLogStats({ days: 1 })
-  const { data: commentStats, isLoading: commentLoading, isError: commentError } = useCommentStatistics()
+  // Statistics queries
+  const { data: newsStats, isLoading: newsLoading } = useNewsStatistics()
+  const { data: userStats, isLoading: usersLoading } = useUsersStatistics()
+  const { data: logStats, isLoading: logLoading } = useLogStats()
+  const { data: commentStats, isLoading: commentLoading } = useCommentStatistics()
+
+  // Error state
+  const hasError = !newsStats && !userStats && !logStats && !commentStats
 
   const quickActions = [
     {
@@ -64,20 +67,16 @@ export function AdminHome() {
     }
   ]
 
-  // Yükleniyor durumu
-  const isLoading = newsLoading || usersLoading || logLoading || commentLoading
-  const hasError = newsError || usersError || logError || commentError
-
   // İstatistik kartları - gerçek API verilerine dayalı
   const getAdminStats = () => {
     return [
       { 
         title: 'Toplam Kullanıcı', 
-        value: usersStats?.data?.total?.toString() || '0', 
+        value: userStats?.data?.total?.toString() || '0', 
         icon: Users, 
         color: 'text-blue-600',
         loading: usersLoading,
-        error: usersError
+        error: !userStats
       },
       { 
         title: 'Aktif Haberler', 
@@ -85,7 +84,7 @@ export function AdminHome() {
         icon: FileText, 
         color: 'text-green-600',
         loading: newsLoading,
-        error: newsError
+        error: !newsStats
       },
       { 
         title: 'Toplam Yorum', 
@@ -93,7 +92,7 @@ export function AdminHome() {
         icon: BarChart3, 
         color: 'text-purple-600',
         loading: commentLoading,
-        error: commentError
+        error: !commentStats
       },
       { 
         title: 'Sistem Durumu', 
@@ -234,19 +233,19 @@ export function AdminHome() {
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-full" />
                 </div>
-              ) : usersStats?.data ? (
+              ) : userStats?.data ? (
                 <>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Aktif:</span>
-                    <span className="font-medium text-green-600">{usersStats.data.active}</span>
+                    <span className="font-medium text-green-600">{userStats.data.active}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Pasif:</span>
-                    <span className="font-medium text-gray-600">{usersStats.data.inactive}</span>
+                    <span className="font-medium text-gray-600">{userStats.data.inactive}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Toplam:</span>
-                    <span className="font-medium">{usersStats.data.total}</span>
+                    <span className="font-medium">{userStats.data.total}</span>
                   </div>
                 </>
               ) : (
