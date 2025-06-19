@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
-import { Plus, MessageSquare } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { useAuthStore } from '@/store/auth-store'
 import { CategoryList, TopicList, TopicForm } from '@/features/forum'
 
@@ -86,43 +86,10 @@ export function ForumPage() {
       {/* Content */}
       <div className="space-y-6">
         {currentView === 'categories' && (
-          <>
-            {/* Forum Stats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5" />
-                  Forum İstatistikleri
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">-</div>
-                    <div className="text-sm text-muted-foreground">Toplam Konu</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">-</div>
-                    <div className="text-sm text-muted-foreground">Toplam Gönderi</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">-</div>
-                    <div className="text-sm text-muted-foreground">Aktif Üye</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-primary">-</div>
-                    <div className="text-sm text-muted-foreground">Bugün Yeni</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Categories */}
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Kategoriler</h2>
-              <CategoryList onCategorySelect={handleCategorySelect} />
-            </div>
-          </>
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Kategoriler</h2>
+            <CategoryList onCategorySelect={handleCategorySelect} />
+          </div>
         )}
 
         {currentView === 'topics' && (
