@@ -7,6 +7,9 @@ import RegisterPage from '@/pages/auth/RegisterPage'
 import NewsPage from '@/pages/NewsPage'
 import NewsDetailPage from '@/pages/NewsDetailPage'
 import { ProfilePage } from '@/pages/ProfilePage'
+import { ForumPage } from '@/pages/ForumPage'
+import { ForumTopicPage } from '@/pages/ForumTopicPage'
+import { CreateTopicPage } from '@/pages/CreateTopicPage'
 import AdminHomePage from '@/pages/admin/AdminHomePage'
 import LogViewerPage from '@/pages/admin/LogViewerPage'
 import NewsManagementPage from '@/pages/admin/NewsManagementPage'
@@ -34,6 +37,19 @@ export const router = createBrowserRouter([
       {
         path: 'news/:slug',
         element: <NewsDetailPage />,
+      },
+      {
+        path: 'forum',
+        element: <ForumPage />,
+      },
+      {
+        path: 'forum/topic/:topicId',
+        element: <ForumTopicPage />,
+      },
+      {
+        path: 'forum/create',
+        loader: requireAuth,
+        element: <CreateTopicPage />,
       },
       {
         path: 'profile',
