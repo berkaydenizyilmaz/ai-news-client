@@ -16,6 +16,17 @@ import type {
   UpdateUserStatusRequest
 } from '../types'
 
+// Direct exports for individual hooks
+export { 
+  useUsers,
+  useUsersStatistics,
+  useUser,
+  useUpdateUser,
+  useUpdateUserRole,
+  useUpdateUserStatus,
+  useDeleteUser
+}
+
 // Kullanıcı yönetimi için wrapper hook
 // Admin kontrollerini ve toast mesajlarını içerir
 export const useUsersManager = () => {

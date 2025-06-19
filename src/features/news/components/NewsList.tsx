@@ -99,7 +99,7 @@ export function NewsList({
             </h2>
             <div className="h-6 w-px bg-border"></div>
             <span className="text-sm text-muted-foreground">
-              Sayfa {currentParams.page} / {data.totalPages}
+              Sayfa {currentParams?.page || 1} / {data.totalPages}
             </span>
           </div>
         </div>
@@ -120,14 +120,14 @@ export function NewsList({
         <div className="bg-card rounded-xl border p-6 mt-12">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-sm text-muted-foreground">
-              Toplam {data.total.toLocaleString('tr-TR')} haberden {((currentParams.page! - 1) * (currentParams.limit || 12) + 1).toLocaleString('tr-TR')}-{Math.min(currentParams.page! * (currentParams.limit || 12), data.total).toLocaleString('tr-TR')} arası gösteriliyor
+              Toplam {data.total.toLocaleString('tr-TR')} haberden {(((currentParams?.page || 1) - 1) * (currentParams?.limit || 12) + 1).toLocaleString('tr-TR')}-{Math.min((currentParams?.page || 1) * (currentParams?.limit || 12), data.total).toLocaleString('tr-TR')} arası gösteriliyor
             </div>
             
             <div className="flex items-center space-x-2">
               <Button
                 variant="outline"
-                onClick={() => handlePageChange(currentParams.page! - 1)}
-                disabled={currentParams.page === 1}
+                onClick={() => handlePageChange((currentParams?.page || 1) - 1)}
+                disabled={(currentParams?.page || 1) === 1}
                 className="px-6"
               >
                 ← Önceki
@@ -136,7 +136,7 @@ export function NewsList({
               <div className="flex items-center space-x-1">
                 {Array.from({ length: Math.min(5, data.totalPages) }, (_, i) => {
                   const page = i + 1
-                  const isCurrentPage = page === currentParams.page
+                  const isCurrentPage = page === (currentParams?.page || 1)
                   
                   return (
                     <Button
@@ -168,8 +168,8 @@ export function NewsList({
 
               <Button
                 variant="outline"
-                onClick={() => handlePageChange(currentParams.page! + 1)}
-                disabled={currentParams.page === data.totalPages}
+                onClick={() => handlePageChange((currentParams?.page || 1) + 1)}
+                disabled={(currentParams?.page || 1) === data.totalPages}
                 className="px-6"
               >
                 Sonraki →

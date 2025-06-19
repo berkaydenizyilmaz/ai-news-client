@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { X, Save } from 'lucide-react'
-import { useNewsDetailQuery, useCreateNewsMutation, useUpdateNewsMutation } from '@/features/news'
+import { useNewsDetail, useCreateNews, useUpdateNews } from '@/features/news'
 import type { NewsCategory } from '@/features/news'
 
 const newsFormSchema = z.object({
@@ -35,10 +35,10 @@ interface NewsFormProps {
 export function NewsForm({ newsId, onClose, categories }: NewsFormProps) {
   const isEditing = Boolean(newsId)
   
-  const { data: newsDetail } = useNewsDetailQuery(isEditing ? newsId! : undefined)
+  const { data: newsDetail } = useNewsDetail(isEditing ? newsId! : undefined)
   
-  const createNewsMutation = useCreateNewsMutation()
-  const updateNewsMutation = useUpdateNewsMutation()
+  const createNewsMutation = useCreateNews()
+  const updateNewsMutation = useUpdateNews()
 
   const form = useForm<NewsFormData>({
     resolver: zodResolver(newsFormSchema),

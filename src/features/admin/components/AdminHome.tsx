@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Link } from 'react-router-dom'
 import { 
   Users, 
@@ -8,18 +9,22 @@ import {
   Settings,
   Activity,
   Shield,
-  Rss
+  Rss,
+  AlertCircle
 } from 'lucide-react'
+import { useNewsStatistics, useCommentStatistics } from '@/features/news'
+import { useUsersStatistics } from '../hooks/use-users'
+import { useLogStats } from '../services/log-api'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 // Admin ana sayfası bileşeni
 // Admin panelinin genel görünümünü ve hızlı erişim linklerini sağlar
 export function AdminHome() {
-  const adminStats = [
-    { title: 'Toplam Kullanıcı', value: '1,234', icon: Users, color: 'text-blue-600' },
-    { title: 'Aktif Haberler', value: '567', icon: FileText, color: 'text-green-600' },
-    { title: 'Günlük Ziyaret', value: '8,901', icon: BarChart3, color: 'text-purple-600' },
-    { title: 'Sistem Durumu', value: 'Aktif', icon: Activity, color: 'text-emerald-600' },
-  ]
+  // API verilerini çek
+  const { data: newsStats, isLoading: newsLoading, isError: newsError } = useNewsStatistics()
+  const { data: usersStats, isLoading: usersLoading, isError: usersError } = useUsersStatistics()
+  const { data: logStats, isLoading: logLoading, isError: logError } = useLogStats({ days: 1 })
+  const { data: commentStats, isLoading: commentLoading, isError: commentError } = useCommentStatistics()
 
   const quickActions = [
     {
@@ -59,6 +64,48 @@ export function AdminHome() {
     }
   ]
 
+  // Yükleniyor durumu
+  const isLoading = newsLoading || usersLoading || logLoading || commentLoading
+  const hasError = newsError || usersError || logError || commentError
+
+  // İstatistik kartları - gerçek API verilerine dayalı
+  const getAdminStats = () => {
+    return [
+      { 
+        title: 'Toplam Kullanıcı', 
+        value: usersStats?.data?.total?.toString() || '0', 
+        icon: Users, 
+        color: 'text-blue-600',
+        loading: usersLoading,
+        error: usersError
+      },
+      { 
+        title: 'Aktif Haberler', 
+        value: newsStats?.published_news?.toString() || '0', 
+        icon: FileText, 
+        color: 'text-green-600',
+        loading: newsLoading,
+        error: newsError
+      },
+      { 
+        title: 'Toplam Yorum', 
+        value: commentStats?.total_comments?.toString() || '0', 
+        icon: BarChart3, 
+        color: 'text-purple-600',
+        loading: commentLoading,
+        error: commentError
+      },
+      { 
+        title: 'Sistem Durumu', 
+        value: 'Aktif', 
+        icon: Activity, 
+        color: 'text-emerald-600',
+        loading: false,
+        error: false
+      },
+    ]
+  }
+
   return (
     <div className="space-y-6">
       {/* Başlık */}
@@ -69,9 +116,19 @@ export function AdminHome() {
         </p>
       </div>
 
+      {/* Hata durumu */}
+      {hasError && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Bazı istatistikler yüklenirken hata oluştu. Veriler güncel olmayabilir.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* İstatistikler */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {adminStats.map((stat) => {
+        {getAdminStats().map((stat) => {
           const Icon = stat.icon
           return (
             <Card key={stat.title}>
@@ -82,12 +139,164 @@ export function AdminHome() {
                 <Icon className={`h-4 w-4 ${stat.color}`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
+                {stat.loading ? (
+                  <Skeleton className="h-8 w-16" />
+                ) : stat.error ? (
+                  <div className="text-2xl font-bold text-muted-foreground">-</div>
+                ) : (
+                  <div className="text-2xl font-bold">{stat.value}</div>
+                )}
+                {stat.error && (
+                  <p className="text-xs text-destructive mt-1">Yüklenemedi</p>
+                )}
               </CardContent>
             </Card>
           )
         })}
       </div>
+
+      {/* Ek İstatistikler */}
+      {(newsStats && !newsLoading) && (
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Haber Durumları</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {newsLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Yayında:</span>
+                    <span className="font-medium text-green-600">{newsStats.published_news}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Beklemede:</span>
+                    <span className="font-medium text-yellow-600">{newsStats.pending_news}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">İşleniyor:</span>
+                    <span className="font-medium text-blue-600">{newsStats.processing_news}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Reddedilen:</span>
+                    <span className="font-medium text-red-600">{newsStats.rejected_news}</span>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">AI Performansı</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {newsLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Ortalama Güven:</span>
+                    <span className="font-medium">%{Math.round((newsStats.avg_confidence_score || 0) * 100)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Ortalama İşlem:</span>
+                    <span className="font-medium">{Math.round(newsStats.processing_time_avg || 0)}s</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Toplam Kaynak:</span>
+                    <span className="font-medium">{newsStats.total_sources}</span>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Kullanıcı Durumları</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {usersLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              ) : usersStats?.data ? (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Aktif:</span>
+                    <span className="font-medium text-green-600">{usersStats.data.active}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Pasif:</span>
+                    <span className="font-medium text-gray-600">{usersStats.data.inactive}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Toplam:</span>
+                    <span className="font-medium">{usersStats.data.total}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center text-muted-foreground text-sm">
+                  Veri yüklenemedi
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Yorum İstatistikleri</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {commentLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              ) : commentStats ? (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Aktif Yorumlar:</span>
+                    <span className="font-medium text-green-600">{commentStats.active_comments}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Bu Hafta:</span>
+                    <span className="font-medium text-blue-600">{commentStats.comments_this_week}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Bu Ay:</span>
+                    <span className="font-medium text-purple-600">{commentStats.comments_this_month}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-sm text-muted-foreground">Toplam:</span>
+                    <span className="font-medium">{commentStats.total_comments}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center text-muted-foreground text-sm">
+                  Veri yüklenemedi
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Hızlı Erişim */}
       <div>
@@ -119,7 +328,7 @@ export function AdminHome() {
         </div>
       </div>
 
-      {/* Son Aktiviteler */}
+      {/* Son Aktiviteler - Log verilerinden */}
       <Card>
         <CardHeader>
           <CardTitle>Son Aktiviteler</CardTitle>
@@ -128,23 +337,56 @@ export function AdminHome() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            <div className="flex items-center space-x-3 text-sm">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-muted-foreground">10:30</span>
-              <span>Yeni kullanıcı kaydı: john_doe</span>
+          {logLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="flex items-center space-x-3">
+                  <Skeleton className="w-2 h-2 rounded-full" />
+                  <Skeleton className="w-12 h-4" />
+                  <Skeleton className="flex-1 h-4" />
+                </div>
+              ))}
             </div>
-            <div className="flex items-center space-x-3 text-sm">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <span className="text-muted-foreground">09:15</span>
-              <span>Sistem güncellemesi tamamlandı</span>
+          ) : logStats?.data ? (
+            <div className="space-y-3">
+              {logStats.data.recent_activity?.slice(0, 5).map((activity, index) => (
+                <div key={index} className="flex items-center space-x-3 text-sm">
+                  <div className={`w-2 h-2 rounded-full ${
+                    index === 0 ? 'bg-green-500' : 
+                    index === 1 ? 'bg-blue-500' : 'bg-yellow-500'
+                  }`}></div>
+                  <span className="text-muted-foreground">{activity.date}</span>
+                  <span>{activity.count} işlem gerçekleştirildi</span>
+                </div>
+              ))}
+              
+              {/* Log seviyeleri özeti */}
+              <div className="mt-4 pt-4 border-t">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Info: {logStats.data.logs_by_level?.info || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                    <span>Warning: {logStats.data.logs_by_level?.warning || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                    <span>Error: {logStats.data.logs_by_level?.error || 0}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                    <span>Debug: {logStats.data.logs_by_level?.debug || 0}</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center space-x-3 text-sm">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-              <span className="text-muted-foreground">08:45</span>
-              <span>Backup işlemi başlatıldı</span>
+          ) : (
+            <div className="text-center text-muted-foreground py-4">
+              Son aktivite verisi yüklenemedi
             </div>
-          </div>
+          )}
         </CardContent>
       </Card>
     </div>

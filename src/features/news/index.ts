@@ -11,7 +11,19 @@ export { Comment } from './components/Comment'
 export { CommentsSection } from './components/CommentsSection'
 
 // Hooks
-export { useNews, useNewsDetail, useCategories, useHomePageNews, useNewsFilters } from './hooks/use-news'
+export { 
+  useNews, 
+  useNewsDetail, 
+  useCategories, 
+  useCategoriesQuery, 
+  useNewsStatistics,
+  useHomePageNews, 
+  useNewsFilters,
+  useCreateNews,
+  useUpdateNews,
+  useDeleteNews,
+  newsKeys
+} from './hooks/use-news'
 export { 
   useNewsComments, 
   useComment, 
@@ -26,6 +38,7 @@ export {
 
 // Services
 export * from './services/news-api'
+export * from './services/comments-api'
 
 // Types
 export type { 
@@ -34,6 +47,11 @@ export type {
   NewsSource, 
   NewsFilters, 
   NewsResponse,
+  NewsStatus,
+  NewsQueryParams,
+  CategoryQueryParams,
+  NewsListResponse,
+  NewsStatistics,
   Comment,
   CommentUser,
   CommentWithUser,

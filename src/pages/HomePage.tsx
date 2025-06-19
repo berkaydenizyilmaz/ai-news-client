@@ -1,10 +1,9 @@
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, TrendingUp, Clock, Eye, Zap, Star, Globe, BarChart3 } from 'lucide-react'
-import { useHomePageNews, NewsCard } from '@/features/news'
+import { useHomePageNews, NewsCard, type ProcessedNews } from '@/features/news'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 
@@ -34,7 +33,7 @@ const getCategoryStyle = (categoryName: string) => {
 
 function HomePage() {
   const navigate = useNavigate()
-  const { latestNews, categories, statistics, isLoading, isError, refetch } = useHomePageNews()
+  const { latestNews, categories, isLoading, isError, refetch } = useHomePageNews()
 
   const handleCategoryClick = (categoryId: string) => {
     navigate(`/news?category=${categoryId}`)
@@ -59,10 +58,10 @@ function HomePage() {
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
         
-        <div className="relative container mx-auto px-4 py-24">
+        <div className="relative container mx-auto px-4 py-2">
           <div className="max-w-6xl mx-auto">
             {/* Main Hero Content */}
-            <div className="text-center mb-16">
+            <div className="text-center">
               {/* Breaking News Badge */}
               <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-full text-sm font-bold mb-8 shadow-lg animate-pulse">
                 <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
@@ -84,34 +83,8 @@ function HomePage() {
                   <Zap className="mr-2 h-6 w-6" />
                   Haberleri Keşfet
                 </Button>
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105" onClick={() => navigate('/news?sort=view_count')}>
-                  <TrendingUp className="mr-2 h-6 w-6" />
-                  Trend Haberler
-                </Button>
               </div>
             </div>
-
-            {/* Live Stats */}
-            {statistics && (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
-                <Card className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm">
-                  <div className="text-3xl font-black text-primary mb-2">{statistics.published_news}</div>
-                  <div className="text-sm text-muted-foreground font-medium">Aktif Haber</div>
-                </Card>
-                <Card className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm">
-                  <div className="text-3xl font-black text-primary mb-2">{statistics.total_sources}</div>
-                  <div className="text-sm text-muted-foreground font-medium">Güvenilir Kaynak</div>
-                </Card>
-                <Card className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm">
-                  <div className="text-3xl font-black text-primary mb-2">%{Math.round((statistics.avg_confidence_score || 0) * 100)}</div>
-                  <div className="text-sm text-muted-foreground font-medium">AI Güven Skoru</div>
-                </Card>
-                <Card className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 bg-card/50 backdrop-blur-sm">
-                  <div className="text-3xl font-black text-primary mb-2">{statistics.categories_count}</div>
-                  <div className="text-sm text-muted-foreground font-medium">Kategori</div>
-                </Card>
-              </div>
-            )}
           </div>
         </div>
       </section>
@@ -190,10 +163,10 @@ function HomePage() {
                   </div>
                 )}
               </div>
-
+              {/*
               {/* Side featured news */}
               <div className="space-y-6">
-                {featuredNews.slice(1, 3).map((news) => (
+                {featuredNews.slice(1, 3).map((news: ProcessedNews) => (
                   <div 
                     key={news.id}
                     className="group cursor-pointer bg-card rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
@@ -317,7 +290,7 @@ function HomePage() {
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {recentNews.map((news) => (
+                  {recentNews.map((news: ProcessedNews) => (
                     <NewsCard
                       key={news.id}
                       news={news}

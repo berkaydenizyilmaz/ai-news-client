@@ -3,42 +3,27 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Search, Plus, Filter } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Search, Filter, BarChart3, Eye, TrendingUp, Calendar } from 'lucide-react'
 import { NewsTable } from './NewsTable'
-import { useNews, useCategoriesQuery } from '@/features/news'
-import type { NewsStatus, NewsCategory } from '@/features/news'
-
-const NewsForm = ({ newsId, onClose }: { newsId: string | null, onClose: () => void, categories: NewsCategory[] }) => {
-  // Basit placeholder component
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg p-6">
-        <h2 className="text-lg font-bold mb-4">
-          {newsId ? 'Haber Düzenle' : 'Yeni Haber Ekle'}
-        </h2>
-        <p>Form henüz hazır değil...</p>
-        <Button onClick={onClose} className="mt-4">Kapat</Button>
-      </div>
-    </div>
-  )
-}
+import { useNews, useCategoriesQuery, useNewsStatistics } from '@/features/news'
+import type { NewsCategory, NewsListResponse, NewsStatistics } from '@/features/news'
 
 export function NewsManagement() {
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [editingNews, setEditingNews] = useState<string | null>(null)
   const [filters, setFilters] = useState({
     search: '',
-    status: '' as NewsStatus | '',
     category: '',
+    sort_by: 'published_at' as 'published_at' | 'view_count' | 'created_at',
+    sort_order: 'desc' as 'asc' | 'desc',
     page: 1
   })
 
+  // Sadece yayınlanan haberleri çek
   const { data: newsData, isLoading, refetch } = useNews({
     ...filters,
-    status: filters.status || undefined,
+    status: 'published', // Sadece yayınlanan haberler
+    category_id: filters.category || undefined,
     limit: 20,
-    sort_by: 'created_at',
-    sort_order: 'desc'
   })
 
   const { data: categoriesData } = useCategoriesQuery({
@@ -46,13 +31,15 @@ export function NewsManagement() {
     limit: 50
   })
 
+  const { data: statistics } = useNewsStatistics()
+
+  // Type assertions
+  const typedNewsData = newsData as NewsListResponse | undefined
+  const typedCategoriesData = categoriesData as { categories: NewsCategory[] } | undefined
+  const typedStatistics = statistics as NewsStatistics | undefined
+
   const handleSearch = (search: string) => {
     setFilters(prev => ({ ...prev, search, page: 1 }))
-  }
-
-  const handleStatusFilter = (status: string) => {
-    const statusValue = status === 'all' ? '' : status as NewsStatus
-    setFilters(prev => ({ ...prev, status: statusValue, page: 1 }))
   }
 
   const handleCategoryFilter = (category: string) => {
@@ -60,39 +47,33 @@ export function NewsManagement() {
     setFilters(prev => ({ ...prev, category: categoryValue, page: 1 }))
   }
 
+  const handleSortChange = (sort_by: string) => {
+    setFilters(prev => ({ 
+      ...prev, 
+      sort_by: sort_by as 'published_at' | 'view_count' | 'created_at',
+      page: 1 
+    }))
+  }
+
+  const handleSortOrderChange = () => {
+    setFilters(prev => ({ 
+      ...prev, 
+      sort_order: prev.sort_order === 'desc' ? 'asc' : 'desc',
+      page: 1 
+    }))
+  }
+
   const handlePageChange = (page: number) => {
     setFilters(prev => ({ ...prev, page }))
   }
 
-  const handleCreateNews = () => {
-    setEditingNews(null)
-    setIsFormOpen(true)
-  }
-
-  const handleEditNews = (newsId: string) => {
-    setEditingNews(newsId)
-    setIsFormOpen(true)
-  }
-
-  const handleFormClose = () => {
-    setIsFormOpen(false)
-    setEditingNews(null)
-    refetch()
-  }
-
-  const statusCounts = {
-    total: newsData?.total || 0,
-    published: 0,
-    pending: 0,
-    processing: 0,
-    rejected: 0
-  }
-
-  // Bu veriler normalde ayrı bir API'den gelecek
-  if (newsData?.news) {
-    newsData.news.forEach(news => {
-      statusCounts[news.status]++
-    })
+  const getSortLabel = (sortBy: string) => {
+    const labels: Record<string, string> = {
+      'published_at': 'Yayın Tarihi',
+      'view_count': 'Görüntülenme',
+      'created_at': 'Oluşturma Tarihi'
+    }
+    return labels[sortBy] || sortBy
   }
 
   return (
@@ -100,81 +81,82 @@ export function NewsManagement() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Haber Yönetimi</h1>
-          <p className="text-muted-foreground">
-            Haberleri yönetin, düzenleyin ve yayın durumlarını kontrol edin
+          <h1 className="text-3xl font-bold flex items-center gap-3">
+            <BarChart3 className="h-8 w-8 text-primary" />
+            Yayınlanan Haberler
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Yayında olan haberleri görüntüleyin, düzenleyin ve analiz edin
           </p>
         </div>
-        <Button onClick={handleCreateNews}>
-          <Plus className="mr-2 h-4 w-4" />
-          Yeni Haber
-        </Button>
+        <Badge variant="outline" className="text-sm px-3 py-2">
+          <Eye className="h-4 w-4 mr-2" />
+          Sadece Yayında Olanlar
+        </Badge>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Toplam</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{statusCounts.total}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Yayında</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{statusCounts.published}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Beklemede</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{statusCounts.pending}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">İşleniyor</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{statusCounts.processing}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Reddedilen</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">{statusCounts.rejected}</div>
-          </CardContent>
-        </Card>
-      </div>
+      {typedStatistics && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Toplam Haber</CardTitle>
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{typedStatistics.total_news}</div>
+              <p className="text-xs text-muted-foreground">
+                Tüm durumlar dahil
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Ortalama Güven</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                %{Math.round((typedStatistics.avg_confidence_score || 0) * 100)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                AI güven skoru
+              </p>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Kategori Sayısı</CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{typedStatistics.categories_count}</div>
+              <p className="text-xs text-muted-foreground">
+                Aktif kategoriler
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Filters */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Filter className="h-5 w-5" />
-            Filtreler
+            Filtreler ve Sıralama
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Search */}
-            <div className="flex-1">
+            <div className="lg:col-span-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Haberlerde ara..."
+                  placeholder="Haber başlığında ara..."
                   value={filters.search}
                   onChange={(e) => handleSearch(e.target.value)}
                   className="pl-10"
@@ -182,55 +164,98 @@ export function NewsManagement() {
               </div>
             </div>
 
-            {/* Status Filter */}
-            <Select value={filters.status || undefined} onValueChange={handleStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Durum seçin" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tüm Durumlar</SelectItem>
-                <SelectItem value="published">Yayında</SelectItem>
-                <SelectItem value="pending">Beklemede</SelectItem>
-                <SelectItem value="processing">İşleniyor</SelectItem>
-                <SelectItem value="rejected">Reddedilen</SelectItem>
-              </SelectContent>
-            </Select>
-
             {/* Category Filter */}
             <Select value={filters.category || undefined} onValueChange={handleCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger>
                 <SelectValue placeholder="Kategori seçin" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tüm Kategoriler</SelectItem>
-                {categoriesData?.categories.map((category: NewsCategory) => (
+                {typedCategoriesData?.categories.map((category: NewsCategory) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
+            {/* Sort Options */}
+            <div className="flex gap-2">
+              <Select value={filters.sort_by} onValueChange={handleSortChange}>
+                <SelectTrigger className="flex-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="published_at">Yayın Tarihi</SelectItem>
+                  <SelectItem value="view_count">Görüntülenme</SelectItem>
+                  <SelectItem value="created_at">Oluşturma Tarihi</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Button
+                variant="outline"
+                size="default"
+                onClick={handleSortOrderChange}
+                className="px-3"
+              >
+                {filters.sort_order === 'desc' ? '↓' : '↑'}
+              </Button>
+            </div>
+          </div>
+          
+          {/* Active Filters Display */}
+          <div className="flex flex-wrap gap-2 mt-4">
+            <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300">
+              Durum: Yayında
+            </Badge>
+            {filters.search && (
+              <Badge variant="outline">
+                Arama: "{filters.search}"
+              </Badge>
+            )}
+            {filters.category && typedCategoriesData?.categories && (
+              <Badge variant="outline">
+                Kategori: {typedCategoriesData.categories.find(c => c.id === filters.category)?.name}
+              </Badge>
+            )}
+            <Badge variant="outline">
+              Sıralama: {getSortLabel(filters.sort_by)} ({filters.sort_order === 'desc' ? 'Azalan' : 'Artan'})
+            </Badge>
           </div>
         </CardContent>
       </Card>
 
+      {/* Results Summary */}
+      {typedNewsData && (
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>
+            {typedNewsData.total} yayınlanan haber bulundu
+            {filters.search && ` - "${filters.search}" araması için`}
+          </span>
+          <span>
+            Sayfa {typedNewsData.page} / {typedNewsData.totalPages}
+          </span>
+        </div>
+      )}
+
       {/* News Table */}
       <NewsTable
-        data={newsData}
+        data={typedNewsData}
         isLoading={isLoading}
-        onEdit={handleEditNews}
+        onEdit={(newsId) => {
+          // Haber detayına yönlendir
+          window.open(`/news/${newsId}`, '_blank')
+        }}
         onPageChange={handlePageChange}
         currentPage={filters.page}
       />
 
-      {/* News Form Modal */}
-      {isFormOpen && (
-        <NewsForm
-          newsId={editingNews}
-          onClose={handleFormClose}
-          categories={categoriesData?.categories || []}
-        />
-      )}
+      {/* Refresh Button */}
+      <div className="flex justify-center">
+        <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
+          {isLoading ? 'Yükleniyor...' : 'Yenile'}
+        </Button>
+      </div>
     </div>
   )
 } 

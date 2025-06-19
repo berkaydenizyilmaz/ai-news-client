@@ -1,157 +1,156 @@
-import { useState, useMemo } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, useCallback } from 'react'
 import { useErrorHandler } from '@/hooks/use-error-handler'
-import { 
-  useNewsQuery, 
-  useNewsDetailQuery, 
-  useCategoriesQuery,
-  useNewsStatisticsQuery 
-} from '../services/news-api'
-import type { NewsQueryParams, CategoryQueryParams } from '../types'
+import * as newsApi from '../services/news-api'
+import type { 
+  ProcessedNews, 
+  NewsListResponse, 
+  NewsQueryParams, 
+  CategoryQueryParams,
+  NewsStatistics,
+  NewsStatus
+} from '../types'
 
-// Haber listesi için hook
+// Query Keys
+export const newsKeys = {
+  all: ['news'] as const,
+  lists: () => [...newsKeys.all, 'list'] as const,
+  list: (params: NewsQueryParams) => [...newsKeys.lists(), params] as const,
+  details: () => [...newsKeys.all, 'detail'] as const,
+  detail: (id: string) => [...newsKeys.details(), id] as const,
+  categories: () => [...newsKeys.all, 'categories'] as const,
+  categoryList: (params: CategoryQueryParams) => [...newsKeys.categories(), params] as const,
+  statistics: () => [...newsKeys.all, 'statistics'] as const,
+}
+
+// Haber listesi hook'u
 export const useNews = (initialParams: NewsQueryParams = {}) => {
+  const { handleError } = useErrorHandler()
   const [params, setParams] = useState<NewsQueryParams>({
     page: 1,
     limit: 12,
-    status: 'published',
     sort_by: 'published_at',
     sort_order: 'desc',
-    ...initialParams,
+    ...initialParams
   })
-
-  const { handleError } = useErrorHandler()
   
-  const query = useNewsQuery(params)
-
-  // Hata durumunda error handler'ı çağır
-  if (query.error) {
-    handleError(query.error)
-  }
-
-  const updateParams = (newParams: Partial<NewsQueryParams>) => {
+  const updateParams = useCallback((newParams: Partial<NewsQueryParams>) => {
     setParams(prev => ({ ...prev, ...newParams }))
-  }
-
-  const resetParams = () => {
-    setParams({
-      page: 1,
-      limit: 12,
-      status: 'published',
-      sort_by: 'published_at',
-      sort_order: 'desc',
-    })
-  }
-
+  }, [])
+  
+  const query = useQuery({
+    queryKey: newsKeys.list(params),
+    queryFn: () => newsApi.getNews(params),
+    staleTime: 5 * 60 * 1000, // 5 dakika
+    onError: handleError,
+  })
+  
   return {
     ...query,
     params,
-    updateParams,
-    resetParams,
+    updateParams
   }
 }
 
-// Haber detayı için hook
+// Haber detayı hook'u
 export const useNewsDetail = (id: string | undefined) => {
   const { handleError } = useErrorHandler()
   
-  const query = useNewsDetailQuery(id)
-
-  // Hata durumunda error handler'ı çağır
-  if (query.error) {
-    handleError(query.error)
-  }
-
-  return query
+  return useQuery({
+    queryKey: newsKeys.detail(id || ''),
+    queryFn: () => newsApi.getNewsDetail(id!),
+    enabled: !!id,
+    staleTime: 10 * 60 * 1000, // 10 dakika
+    onError: handleError,
+  })
 }
 
-// Kategoriler için hook
-export const useCategories = (initialParams: CategoryQueryParams = {}) => {
-  const [params, setParams] = useState<CategoryQueryParams>({
-    is_active: true,
-    sort_by: 'name',
-    sort_order: 'asc',
-    ...initialParams,
-  })
-
+// Kategoriler hook'u
+export const useCategories = (params: CategoryQueryParams = {}) => {
   const { handleError } = useErrorHandler()
   
-  const query = useCategoriesQuery(params)
-
-  // Hata durumunda error handler'ı çağır
-  if (query.error) {
-    handleError(query.error)
-  }
-
-  const updateParams = (newParams: Partial<CategoryQueryParams>) => {
-    setParams(prev => ({ ...prev, ...newParams }))
-  }
-
-  return {
-    ...query,
-    params,
-    updateParams,
-  }
+  return useQuery({
+    queryKey: newsKeys.categoryList(params),
+    queryFn: () => newsApi.getCategories(params),
+    staleTime: 15 * 60 * 1000, // 15 dakika
+    onError: handleError,
+  })
 }
 
-// Ana sayfa için özel hook
+// Kategoriler hook'u (alias for backward compatibility)
+export const useCategoriesQuery = useCategories
+
+// İstatistikler hook'u
+export const useNewsStatistics = () => {
+  const { handleError } = useErrorHandler()
+  
+  return useQuery({
+    queryKey: newsKeys.statistics(),
+    queryFn: () => newsApi.getNewsStatistics(),
+    staleTime: 5 * 60 * 1000, // 5 dakika
+    onError: handleError,
+  })
+}
+
+// Ana sayfa için haber verilerini getiren hook
 export const useHomePageNews = () => {
-  // Son haberler
-  const latestNews = useNews({
-    page: 1,
-    limit: 6,
-    status: 'published',
-    sort_by: 'published_at',
+  const latestNewsQuery = useNews({ 
+    limit: 12, 
+    sort_by: 'published_at', 
     sort_order: 'desc',
+    status: 'published'
   })
-
-  // Kategoriler
-  const categories = useCategories({
-    is_active: true,
-    limit: 10,
+  
+  const categoriesQuery = useCategories({ 
+    is_active: true, 
+    limit: 20 
   })
-
-  // İstatistikler
-  const statistics = useNewsStatisticsQuery()
-
-  const isLoading = latestNews.isLoading || categories.isLoading || statistics.isLoading
-  const isError = latestNews.isError || categories.isError || statistics.isError
+  
+  const statisticsQuery = useNewsStatistics()
 
   return {
-    latestNews: latestNews.data?.news || [],
-    categories: categories.data?.categories || [],
-    statistics: statistics.data,
-    isLoading,
-    isError,
+    latestNews: latestNewsQuery.data?.news || [],
+    categories: categoriesQuery.data?.categories || [],
+    statistics: statisticsQuery.data,
+    isLoading: latestNewsQuery.isLoading || categoriesQuery.isLoading || statisticsQuery.isLoading,
+    isError: latestNewsQuery.isError || categoriesQuery.isError || statisticsQuery.isError,
     refetch: () => {
-      latestNews.refetch()
-      categories.refetch()
-      statistics.refetch()
-    },
+      latestNewsQuery.refetch()
+      categoriesQuery.refetch()
+      statisticsQuery.refetch()
+    }
   }
 }
 
-// Arama ve filtreleme için yardımcı hook
+// Haber filtreleme hook'u
 export const useNewsFilters = () => {
+  const queryClient = useQueryClient()
   const [search, setSearch] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState('')
   const [sortBy, setSortBy] = useState<'published_at' | 'view_count'>('published_at')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
-
-  const filters = useMemo(() => ({
-    search: search.trim() || undefined,
-    category_id: selectedCategory || undefined,
-    sort_by: sortBy,
-    sort_order: sortOrder,
-  }), [search, selectedCategory, sortBy, sortOrder])
-
+  
+  const clearFilters = () => {
+    queryClient.invalidateQueries({ queryKey: newsKeys.lists() })
+  }
+  
   const resetFilters = () => {
     setSearch('')
     setSelectedCategory('')
     setSortBy('published_at')
     setSortOrder('desc')
+    clearFilters()
   }
-
-  return {
+  
+  // Filtreleri NewsQueryParams formatında döndür
+  const filters: NewsQueryParams = {
+    search: search || undefined,
+    category: selectedCategory || undefined,
+    sort_by: sortBy,
+    sort_order: sortOrder,
+  }
+  
+  return { 
     search,
     setSearch,
     selectedCategory,
@@ -161,6 +160,51 @@ export const useNewsFilters = () => {
     sortOrder,
     setSortOrder,
     filters,
-    resetFilters,
+    clearFilters,
+    resetFilters
   }
+}
+
+// Admin için haber oluşturma mutation'ı
+export const useCreateNews = () => {
+  const queryClient = useQueryClient()
+  const { handleError } = useErrorHandler()
+  
+  return useMutation({
+    mutationFn: newsApi.createNews,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: newsKeys.all })
+    },
+    onError: handleError,
+  })
+}
+
+// Admin için haber güncelleme mutation'ı
+export const useUpdateNews = () => {
+  const queryClient = useQueryClient()
+  const { handleError } = useErrorHandler()
+  
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => 
+      newsApi.updateNews(id, data),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: newsKeys.all })
+      queryClient.invalidateQueries({ queryKey: newsKeys.detail(id) })
+    },
+    onError: handleError,
+  })
+}
+
+// Admin için haber silme mutation'ı
+export const useDeleteNews = () => {
+  const queryClient = useQueryClient()
+  const { handleError } = useErrorHandler()
+  
+  return useMutation({
+    mutationFn: newsApi.deleteNews,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: newsKeys.all })
+    },
+    onError: handleError,
+  })
 } 

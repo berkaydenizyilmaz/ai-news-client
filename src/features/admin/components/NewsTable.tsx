@@ -1,33 +1,15 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { MoreHorizontal, Edit, Trash2, Eye, Calendar } from 'lucide-react'
-import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
-import { useDeleteNewsMutation, useUpdateNewsMutation } from '@/features/news'
-import type { NewsListResponse, NewsStatus } from '@/features/news'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Trash2, Eye, Calendar, BarChart3 } from 'lucide-react'
+import { useDeleteNews } from '@/features/news'
+import type { NewsListResponse, ProcessedNews } from '@/features/news'
 
 interface NewsTableProps {
-  data?: NewsListResponse
+  data: NewsListResponse | undefined
   isLoading: boolean
   onEdit: (newsId: string) => void
   onPageChange: (page: number) => void
@@ -38,83 +20,64 @@ export function NewsTable({ data, isLoading, onEdit, onPageChange, currentPage }
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [deletingNewsId, setDeletingNewsId] = useState<string | null>(null)
   
-  const deleteNewsMutation = useDeleteNewsMutation()
-  const updateNewsMutation = useUpdateNewsMutation()
+  const deleteNewsMutation = useDeleteNews()
 
-  const handleDelete = (newsId: string) => {
+  const handleDeleteClick = (newsId: string) => {
     setDeletingNewsId(newsId)
     setDeleteDialogOpen(true)
   }
 
-  const confirmDelete = async () => {
-    if (!deletingNewsId) return
-    
-    try {
-      await deleteNewsMutation.mutateAsync(deletingNewsId)
-      setDeleteDialogOpen(false)
-      setDeletingNewsId(null)
-    } catch (error) {
-      console.error('Haber silme hatası:', error)
+  const handleDeleteConfirm = async () => {
+    if (deletingNewsId) {
+      try {
+        await deleteNewsMutation.mutateAsync(deletingNewsId)
+        setDeleteDialogOpen(false)
+        setDeletingNewsId(null)
+      } catch (error) {
+        console.error('Haber silinirken hata:', error)
+      }
     }
   }
 
-  const handleStatusChange = async (newsId: string, status: NewsStatus) => {
-    try {
-      await updateNewsMutation.mutateAsync({
-        id: newsId,
-        data: { status }
-      })
-    } catch (error) {
-      console.error('Durum güncelleme hatası:', error)
-    }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('tr-TR', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
   }
 
-  const getStatusBadge = (status: NewsStatus) => {
-    const variants = {
-      published: { variant: 'default' as const, label: 'Yayında', color: 'bg-green-100 text-green-800' },
-      pending: { variant: 'secondary' as const, label: 'Beklemede', color: 'bg-yellow-100 text-yellow-800' },
-      processing: { variant: 'outline' as const, label: 'İşleniyor', color: 'bg-blue-100 text-blue-800' },
-      rejected: { variant: 'destructive' as const, label: 'Reddedilen', color: 'bg-red-100 text-red-800' }
-    }
-    
-    const config = variants[status]
-    return (
-      <Badge className={config.color}>
-        {config.label}
-      </Badge>
-    )
+  const truncateText = (text: string, maxLength: number = 100) => {
+    if (text.length <= maxLength) return text
+    return text.substring(0, maxLength) + '...'
   }
 
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="flex items-center space-x-4">
-                <Skeleton className="h-16 w-24" />
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-3 w-1/2" />
-                </div>
-                <Skeleton className="h-8 w-20" />
-                <Skeleton className="h-8 w-8" />
-              </div>
-            ))}
+        <CardHeader>
+          <CardTitle>Haberler Yükleniyor...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-center items-center h-32">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         </CardContent>
       </Card>
     )
   }
 
-  if (!data?.news.length) {
+  if (!data || !data.news || data.news.length === 0) {
     return (
       <Card>
-        <CardContent className="p-12 text-center">
-          <div className="text-6xl mb-4">📰</div>
-          <h3 className="text-lg font-medium mb-2">Haber bulunamadı</h3>
-          <p className="text-muted-foreground">
-            Henüz haber bulunmuyor veya filtrelere uygun haber yok.
+        <CardHeader>
+          <CardTitle>Haber Bulunamadı</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-center py-8">
+            Henüz yayınlanmış haber bulunmuyor.
           </p>
         </CardContent>
       </Card>
@@ -124,176 +87,136 @@ export function NewsTable({ data, isLoading, onEdit, onPageChange, currentPage }
   return (
     <>
       <Card>
-        <CardContent className="p-0">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            Yayınlanan Haberler ({data.total})
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b bg-muted/50">
-                <tr>
-                  <th className="text-left p-4 font-medium">Haber</th>
-                  <th className="text-left p-4 font-medium">Kategori</th>
-                  <th className="text-left p-4 font-medium">Durum</th>
-                  <th className="text-left p-4 font-medium">Tarih</th>
-                  <th className="text-left p-4 font-medium">Görüntülenme</th>
-                  <th className="text-left p-4 font-medium">İşlemler</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.news.map((news) => (
-                  <tr key={news.id} className="border-b hover:bg-muted/25 transition-colors">
-                    <td className="p-4">
-                      <div className="flex items-start space-x-3">
-                        {news.image_url ? (
-                          <img
-                            src={news.image_url}
-                            alt={news.title}
-                            className="w-16 h-12 object-cover rounded"
-                          />
-                        ) : (
-                          <div className="w-16 h-12 bg-muted rounded flex items-center justify-center">
-                            <span className="text-xs text-muted-foreground">Görsel Yok</span>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[40%]">Başlık</TableHead>
+                  <TableHead className="w-[20%]">Kategori</TableHead>
+                  <TableHead className="w-[15%]">Görüntülenme</TableHead>
+                  <TableHead className="w-[15%]">Yayın Tarihi</TableHead>
+                  <TableHead className="w-[10%] text-right">İşlemler</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.news.map((news: ProcessedNews) => (
+                  <TableRow key={news.id} className="hover:bg-muted/50">
+                    <TableCell>
+                      <div className="space-y-1">
+                        <h4 className="font-medium leading-tight">
+                          {truncateText(news.title, 80)}
+                        </h4>
+                        {news.summary && (
+                          <p className="text-sm text-muted-foreground">
+                            {truncateText(news.summary, 120)}
+                          </p>
+                        )}
+                        {news.tags && news.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {news.tags.slice(0, 3).map((tag, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {tag}
+                              </Badge>
+                            ))}
+                            {news.tags.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{news.tags.length - 3}
+                              </Badge>
+                            )}
                           </div>
                         )}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium line-clamp-2 mb-1">
-                            {news.title}
-                          </h4>
-                          {news.summary && (
-                            <p className="text-sm text-muted-foreground line-clamp-2">
-                              {news.summary}
-                            </p>
-                          )}
-                        </div>
                       </div>
-                    </td>
-                    <td className="p-4">
+                    </TableCell>
+                    <TableCell>
                       {news.category ? (
-                        <Badge variant="outline">{news.category.name}</Badge>
+                        <Badge variant="secondary">
+                          {news.category.name}
+                        </Badge>
                       ) : (
-                        <span className="text-muted-foreground text-sm">Kategori Yok</span>
+                        <span className="text-muted-foreground text-sm">-</span>
                       )}
-                    </td>
-                    <td className="p-4">
-                      {getStatusBadge(news.status)}
-                    </td>
-                    <td className="p-4">
-                      <div className="text-sm">
-                        <div className="flex items-center gap-1 mb-1">
-                          <Calendar className="h-3 w-3" />
-                          {format(new Date(news.created_at), 'dd MMM yyyy', { locale: tr })}
-                        </div>
-                        <div className="text-muted-foreground">
-                          {format(new Date(news.created_at), 'HH:mm')}
-                        </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <span className="font-medium">{news.view_count.toLocaleString()}</span>
                       </div>
-                    </td>
-                    <td className="p-4">
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-1 text-sm">
-                        <Eye className="h-3 w-3" />
-                        {news.view_count.toLocaleString('tr-TR')}
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                        <span>
+                          {news.published_at 
+                            ? formatDate(news.published_at)
+                            : formatDate(news.created_at)
+                          }
+                        </span>
                       </div>
-                    </td>
-                    <td className="p-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => onEdit(news.id)}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            Düzenle
-                          </DropdownMenuItem>
-                          
-                          <DropdownMenuSeparator />
-                          
-                          {news.status !== 'published' && (
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(news.id, 'published')}
-                            >
-                              Yayınla
-                            </DropdownMenuItem>
-                          )}
-                          
-                          {news.status !== 'pending' && (
-                            <DropdownMenuItem 
-                              onClick={() => handleStatusChange(news.id, 'pending')}
-                            >
-                              Bekletme Al
-                            </DropdownMenuItem>
-                          )}
-                          
-                          <DropdownMenuSeparator />
-                          
-                          <DropdownMenuItem 
-                            onClick={() => handleDelete(news.id)}
-                            className="text-red-600 focus:text-red-600"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Sil
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                  </tr>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onEdit(news.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteClick(news.id)}
+                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Pagination */}
-      {data.totalPages > 1 && (
-        <div className="flex items-center justify-center space-x-2">
-          <Button
-            variant="outline"
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            Önceki
-          </Button>
           
-          <div className="flex items-center space-x-1">
-            {Array.from({ length: Math.min(5, data.totalPages) }, (_, i) => {
-              const page = i + 1
-              const isCurrentPage = page === currentPage
-              
-              return (
-                <Button
-                  key={page}
-                  variant={isCurrentPage ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => onPageChange(page)}
-                >
-                  {page}
-                </Button>
-              )
-            })}
-            
-            {data.totalPages > 5 && (
-              <>
-                <span className="px-2">...</span>
+          {/* Pagination */}
+          {data.totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4">
+              <p className="text-sm text-muted-foreground">
+                Sayfa {data.page} / {data.totalPages} - Toplam {data.total} haber
+              </p>
+              <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => onPageChange(data.totalPages)}
+                  onClick={() => onPageChange(currentPage - 1)}
+                  disabled={currentPage <= 1}
                 >
-                  {data.totalPages}
+                  Önceki
                 </Button>
-              </>
-            )}
-          </div>
-
-          <Button
-            variant="outline"
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === data.totalPages}
-          >
-            Sonraki
-          </Button>
-        </div>
-      )}
+                <span className="text-sm px-2">
+                  {currentPage} / {data.totalPages}
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onPageChange(currentPage + 1)}
+                  disabled={currentPage >= data.totalPages}
+                >
+                  Sonraki
+                </Button>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -307,11 +230,10 @@ export function NewsTable({ data, isLoading, onEdit, onPageChange, currentPage }
           <AlertDialogFooter>
             <AlertDialogCancel>İptal</AlertDialogCancel>
             <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-red-600 hover:bg-red-700"
-              disabled={deleteNewsMutation.isPending}
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleteNewsMutation.isPending ? 'Siliniyor...' : 'Sil'}
+              Sil
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
