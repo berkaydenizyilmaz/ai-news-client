@@ -33,7 +33,13 @@ import {
 export const useForumCategories = () => {
   return useQuery<ForumCategory[]>({
     queryKey: ['forum-categories'],
-    queryFn: getForumCategories
+    queryFn: getForumCategories,
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    select: (data) => data || [],
+    onError: (error) => {
+      console.warn('Forum kategorileri yüklenemedi:', error);
+    }
   })
 }
 

@@ -17,7 +17,10 @@ import type {
 
 // Category API Functions
 export const getForumCategories = async (): Promise<ForumCategory[]> => {
+  console.log('🔍 Forum kategorileri API çağrısı yapılıyor...')
   const response = await apiClient.get('/forum/categories')
+  console.log('📊 Forum kategorileri response:', response)
+  console.log('📋 Forum kategorileri data:', response.data)
   return response.data.data
 }
 

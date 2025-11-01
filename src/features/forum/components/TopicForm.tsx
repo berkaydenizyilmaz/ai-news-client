@@ -32,7 +32,7 @@ export function TopicForm({ editingTopic, onSuccess, onCancel }: TopicFormProps)
   const [titleCount, setTitleCount] = useState(editingTopic?.title?.length || 0)
   const [contentCount, setContentCount] = useState(editingTopic?.content?.length || 0)
   
-  const { data: categories, isLoading: categoriesLoading } = useForumCategories()
+  const { data: categories, isLoading: categoriesLoading, error: categoriesError } = useForumCategories()
   const createTopicMutation = useCreateForumTopic()
   const updateTopicMutation = useUpdateForumTopic()
   
@@ -84,6 +84,17 @@ export function TopicForm({ editingTopic, onSuccess, onCancel }: TopicFormProps)
     return value
   }
 
+  if (categoriesError) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground mb-4">Kategoriler yüklenirken hata oluştu</p>
+        <Button variant="outline" onClick={onCancel}>
+          Geri Dön
+        </Button>
+      </div>
+    )
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -96,7 +107,7 @@ export function TopicForm({ editingTopic, onSuccess, onCancel }: TopicFormProps)
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Kategori seçin" />
+                    <SelectValue placeholder={categoriesLoading ? "Kategoriler yükleniyor..." : "Kategori seçin"} />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>

@@ -8,7 +8,6 @@ import {
   FileText, 
   Users, 
   Settings, 
-  BarChart3, 
   Menu, 
   X,
   ChevronLeft,
@@ -38,11 +37,6 @@ const sidebarItems = [
     title: 'RSS Kaynakları',
     href: '/admin/rss',
     icon: Rss
-  },
-  {
-    title: 'İstatistikler',
-    href: '/admin/stats',
-    icon: BarChart3
   },
   {
     title: 'Kullanıcılar',
